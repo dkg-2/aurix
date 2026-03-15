@@ -1,0 +1,3219 @@
+{
+  "scan_id": "ecaedb69-795c-4b52-9060-524546e39af7",
+  "timestamp": "2026-03-15T14:58:40.848345+00:00",
+  "total_findings": 201,
+  "findings": [
+    {
+      "id": "dockerfile.security.missing-user-entrypoint.missing-user-entrypoint",
+      "tool": "opengrep",
+      "category": "sast",
+      "title": "missing-user-entrypoint",
+      "description": "By not specifying a USER, a program in the container may run as 'root'. This is a security hazard. If an attacker can control a process running as root, they may have control over the container. Ensure that the last USER in a Dockerfile is a USER other than 'root'.",
+      "severity": "HIGH",
+      "cvss": 8.0,
+      "file": "Dockerfile",
+      "line": 13,
+      "evidence": "ENTRYPOINT [\"npm\", \"start\"]",
+      "fix": "USER non-root\nENTRYPOINT [\"npm\", \"start\"]",
+      "references": [
+        "https://owasp.org/Top10/A04_2021-Insecure_Design"
+      ]
+    },
+    {
+      "id": "javascript.express.security.audit.express-check-csurf-middleware-usage.express-check-csurf-middleware-usage",
+      "tool": "opengrep",
+      "category": "sast",
+      "title": "express-check-csurf-middleware-usage",
+      "description": "A CSRF middleware was not detected in your express application. Ensure you are either using one such as `csurf` or `csrf` (see rule references) and/or you are properly doing CSRF validation in your routes with a token or cookies.",
+      "severity": "INFO",
+      "cvss": 1.0,
+      "file": "app.js",
+      "line": 28,
+      "evidence": "var app = express();",
+      "fix": "Follow secure coding.",
+      "references": [
+        "https://www.npmjs.com/package/csurf",
+        "https://www.npmjs.com/package/csrf",
+        "https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html"
+      ]
+    },
+    {
+      "id": "javascript.express.security.audit.express-cookie-settings.express-cookie-session-no-domain",
+      "tool": "opengrep",
+      "category": "sast",
+      "title": "express-cookie-session-no-domain",
+      "description": "Default session middleware settings: `domain` not set. It indicates the domain of the cookie; use it to compare against the domain of the server in which the URL is being requested. If they match, then check the path attribute next.",
+      "severity": "MEDIUM",
+      "cvss": 5.5,
+      "file": "app.js",
+      "line": 42,
+      "evidence": "app.use(session({\n  secret: 'keyboard cat',\n  name: 'connect.sid',\n  cookie: { path: '/' }\n}))",
+      "fix": "Follow secure coding.",
+      "references": [
+        "https://owasp.org/Top10/A04_2021-Insecure_Design"
+      ]
+    },
+    {
+      "id": "javascript.express.security.audit.express-cookie-settings.express-cookie-session-no-expires",
+      "tool": "opengrep",
+      "category": "sast",
+      "title": "express-cookie-session-no-expires",
+      "description": "Default session middleware settings: `expires` not set. Use it to set expiration date for persistent cookies.",
+      "severity": "MEDIUM",
+      "cvss": 5.5,
+      "file": "app.js",
+      "line": 42,
+      "evidence": "app.use(session({\n  secret: 'keyboard cat',\n  name: 'connect.sid',\n  cookie: { path: '/' }\n}))",
+      "fix": "Follow secure coding.",
+      "references": [
+        "https://owasp.org/Top10/A04_2021-Insecure_Design"
+      ]
+    },
+    {
+      "id": "javascript.express.security.audit.express-cookie-settings.express-cookie-session-no-httponly",
+      "tool": "opengrep",
+      "category": "sast",
+      "title": "express-cookie-session-no-httponly",
+      "description": "Default session middleware settings: `httpOnly` not set. It ensures the cookie is sent only over HTTP(S), not client JavaScript, helping to protect against cross-site scripting attacks.",
+      "severity": "MEDIUM",
+      "cvss": 5.5,
+      "file": "app.js",
+      "line": 42,
+      "evidence": "app.use(session({\n  secret: 'keyboard cat',\n  name: 'connect.sid',\n  cookie: { path: '/' }\n}))",
+      "fix": "Follow secure coding.",
+      "references": [
+        "https://owasp.org/Top10/A04_2021-Insecure_Design"
+      ]
+    },
+    {
+      "id": "javascript.express.security.audit.express-cookie-settings.express-cookie-session-no-secure",
+      "tool": "opengrep",
+      "category": "sast",
+      "title": "express-cookie-session-no-secure",
+      "description": "Default session middleware settings: `secure` not set. It ensures the browser only sends the cookie over HTTPS.",
+      "severity": "MEDIUM",
+      "cvss": 5.5,
+      "file": "app.js",
+      "line": 42,
+      "evidence": "app.use(session({\n  secret: 'keyboard cat',\n  name: 'connect.sid',\n  cookie: { path: '/' }\n}))",
+      "fix": "Follow secure coding.",
+      "references": [
+        "https://owasp.org/Top10/A04_2021-Insecure_Design"
+      ]
+    },
+    {
+      "id": "javascript.express.security.audit.express-session-hardcoded-secret.express-session-hardcoded-secret",
+      "tool": "opengrep",
+      "category": "sast",
+      "title": "express-session-hardcoded-secret",
+      "description": "A hard-coded credential was detected. It is not recommended to store credentials in source-code, as this risks secrets being leaked and used by either an internal or external malicious adversary. It is recommended to use environment variables to securely provide credentials or retrieve credentials from a secure vault or HSM (Hardware Security Module).",
+      "severity": "MEDIUM",
+      "cvss": 5.5,
+      "file": "app.js",
+      "line": 43,
+      "evidence": "secret: 'keyboard cat',",
+      "fix": "Follow secure coding.",
+      "references": [
+        "https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html"
+      ]
+    },
+    {
+      "id": "problem-based-packs.insecure-transport.js-node.using-http-server.using-http-server",
+      "tool": "opengrep",
+      "category": "sast",
+      "title": "using-http-server",
+      "description": "Checks for any usage of http servers instead of https servers. Encourages the usage of https protocol instead of http, which does not have TLS and is therefore unencrypted. Using http can lead to man-in-the-middle attacks in which the attacker is able to read sensitive information.",
+      "severity": "MEDIUM",
+      "cvss": 5.5,
+      "file": "app.js",
+      "line": 86,
+      "evidence": "http.createServer(app).listen(app.get('port'), function () {",
+      "fix": "Follow secure coding.",
+      "references": [
+        "https://nodejs.org/api/http.html#http_class_http_agent",
+        "https://groups.google.com/g/rubyonrails-security/c/NCCsca7TEtY"
+      ]
+    },
+    {
+      "id": "yaml.docker-compose.security.no-new-privileges.no-new-privileges",
+      "tool": "opengrep",
+      "category": "sast",
+      "title": "no-new-privileges",
+      "description": "Service 'goof-mongo' allows for privilege escalation via setuid or setgid binaries. Add 'no-new-privileges:true' in 'security_opt' to prevent this.",
+      "severity": "MEDIUM",
+      "cvss": 5.5,
+      "file": "docker-compose.yml",
+      "line": 15,
+      "evidence": "goof-mongo:",
+      "fix": "Follow secure coding.",
+      "references": [
+        "https://raesene.github.io/blog/2019/06/01/docker-capabilities-and-no-new-privs/",
+        "https://www.kernel.org/doc/Documentation/prctl/no_new_privs.txt",
+        "https://cheatsheetseries.owasp.org/cheatsheets/Docker_Security_Cheat_Sheet.html#rule-4-add-no-new-privileges-flag"
+      ]
+    },
+    {
+      "id": "yaml.docker-compose.security.writable-filesystem-service.writable-filesystem-service",
+      "tool": "opengrep",
+      "category": "sast",
+      "title": "writable-filesystem-service",
+      "description": "Service 'goof-mongo' is running with a writable root filesystem. This may allow malicious applications to download and run additional payloads, or modify container files. If an application inside a container has to save something temporarily consider using a tmpfs. Add 'read_only: true' to this service to prevent this.",
+      "severity": "MEDIUM",
+      "cvss": 5.5,
+      "file": "docker-compose.yml",
+      "line": 15,
+      "evidence": "goof-mongo:",
+      "fix": "Follow secure coding.",
+      "references": [
+        "https://docs.docker.com/compose/compose-file/compose-file-v3/#domainname-hostname-ipc-mac_address-privileged-read_only-shm_size-stdin_open-tty-user-working_dir",
+        "https://blog.atomist.com/security-of-docker-kubernetes/",
+        "https://cheatsheetseries.owasp.org/cheatsheets/Docker_Security_Cheat_Sheet.html#rule-8-set-filesystem-and-volumes-to-read-only"
+      ]
+    },
+    {
+      "id": "yaml.docker-compose.security.no-new-privileges.no-new-privileges",
+      "tool": "opengrep",
+      "category": "sast",
+      "title": "no-new-privileges",
+      "description": "Service 'good-mysql' allows for privilege escalation via setuid or setgid binaries. Add 'no-new-privileges:true' in 'security_opt' to prevent this.",
+      "severity": "MEDIUM",
+      "cvss": 5.5,
+      "file": "docker-compose.yml",
+      "line": 20,
+      "evidence": "good-mysql:",
+      "fix": "Follow secure coding.",
+      "references": [
+        "https://raesene.github.io/blog/2019/06/01/docker-capabilities-and-no-new-privs/",
+        "https://www.kernel.org/doc/Documentation/prctl/no_new_privs.txt",
+        "https://cheatsheetseries.owasp.org/cheatsheets/Docker_Security_Cheat_Sheet.html#rule-4-add-no-new-privileges-flag"
+      ]
+    },
+    {
+      "id": "yaml.docker-compose.security.writable-filesystem-service.writable-filesystem-service",
+      "tool": "opengrep",
+      "category": "sast",
+      "title": "writable-filesystem-service",
+      "description": "Service 'good-mysql' is running with a writable root filesystem. This may allow malicious applications to download and run additional payloads, or modify container files. If an application inside a container has to save something temporarily consider using a tmpfs. Add 'read_only: true' to this service to prevent this.",
+      "severity": "MEDIUM",
+      "cvss": 5.5,
+      "file": "docker-compose.yml",
+      "line": 20,
+      "evidence": "good-mysql:",
+      "fix": "Follow secure coding.",
+      "references": [
+        "https://docs.docker.com/compose/compose-file/compose-file-v3/#domainname-hostname-ipc-mac_address-privileged-read_only-shm_size-stdin_open-tty-user-working_dir",
+        "https://blog.atomist.com/security-of-docker-kubernetes/",
+        "https://cheatsheetseries.owasp.org/cheatsheets/Docker_Security_Cheat_Sheet.html#rule-8-set-filesystem-and-volumes-to-read-only"
+      ]
+    },
+    {
+      "id": "javascript.express.security.audit.xss.ejs.explicit-unescape.template-explicit-unescape",
+      "tool": "opengrep",
+      "category": "sast",
+      "title": "template-explicit-unescape",
+      "description": "Detected an explicit unescape in an EJS template, using '<%- ... %>' If external data can reach these locations, your application is exposed to a cross-site scripting (XSS) vulnerability. Use '<%= ... %>' to escape this data. If you need escaping, ensure no external data can reach this location.",
+      "severity": "MEDIUM",
+      "cvss": 5.5,
+      "file": "views/admin.ejs",
+      "line": 17,
+      "evidence": "<input type=\"hidden\" name=\"redirectPage\" value=\"<%- redirectPage %>\" />",
+      "fix": "Follow secure coding.",
+      "references": [
+        "http://www.managerjs.com/blog/2015/05/will-ejs-escape-save-me-from-xss-sorta/"
+      ]
+    },
+    {
+      "id": "javascript.express.security.audit.xss.ejs.explicit-unescape.template-explicit-unescape",
+      "tool": "opengrep",
+      "category": "sast",
+      "title": "template-explicit-unescape",
+      "description": "Detected an explicit unescape in an EJS template, using '<%- ... %>' If external data can reach these locations, your application is exposed to a cross-site scripting (XSS) vulnerability. Use '<%= ... %>' to escape this data. If you need escaping, ensure no external data can reach this location.",
+      "severity": "MEDIUM",
+      "cvss": 5.5,
+      "file": "views/index.ejs",
+      "line": 20,
+      "evidence": "<a class=\"update-link\" href=\"/edit/<%= todo._id %>\" title=\"Update this todo item\"><%- marked(new String(todo.content)) %></a>",
+      "fix": "Follow secure coding.",
+      "references": [
+        "http://www.managerjs.com/blog/2015/05/will-ejs-escape-save-me-from-xss-sorta/"
+      ]
+    },
+    {
+      "id": "javascript.express.security.audit.xss.ejs.explicit-unescape.template-explicit-unescape",
+      "tool": "opengrep",
+      "category": "sast",
+      "title": "template-explicit-unescape",
+      "description": "Detected an explicit unescape in an EJS template, using '<%- ... %>' If external data can reach these locations, your application is exposed to a cross-site scripting (XSS) vulnerability. Use '<%= ... %>' to escape this data. If you need escaping, ensure no external data can reach this location.",
+      "severity": "MEDIUM",
+      "cvss": 5.5,
+      "file": "views/layout.ejs",
+      "line": 12,
+      "evidence": "<%- body %>",
+      "fix": "Follow secure coding.",
+      "references": [
+        "http://www.managerjs.com/blog/2015/05/will-ejs-escape-save-me-from-xss-sorta/"
+      ]
+    },
+    {
+      "id": "javascript.express.security.audit.xss.mustache.explicit-unescape.template-explicit-unescape",
+      "tool": "opengrep",
+      "category": "sast",
+      "title": "template-explicit-unescape",
+      "description": "Detected an explicit unescape in a Mustache template, using triple braces '{{{...}}}' or ampersand '&'. If external data can reach these locations, your application is exposed to a cross-site scripting (XSS) vulnerability. If you must do this, ensure no external data can reach this location.",
+      "severity": "MEDIUM",
+      "cvss": 5.5,
+      "file": "views/layout.hbs",
+      "line": 12,
+      "evidence": "{{{body}}}",
+      "fix": "Follow secure coding.",
+      "references": [
+        "https://github.com/janl/mustache.js/#variables",
+        "https://ractive.js.org/v0.x/0.7/mustaches#variables"
+      ]
+    },
+    {
+      "id": "CVE-2018-1002204",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-adm-zip: arbitrary file write vulnerability / arbitrary code execution using a specially crafted zip file",
+      "description": "adm-zip npm library before 0.4.9 is vulnerable to directory traversal, allowing attackers to write to arbitrary files via a ../ (dot dot slash) in a Zip archive entry that is mishandled during extraction. This vulnerability is also known as 'Zip-Slip'.",
+      "severity": "HIGH",
+      "cvss": 5.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "adm-zip",
+      "fix": "Update to >=0.4.9",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2018-1002204"
+      ]
+    },
+    {
+      "id": "CVE-2020-15366",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-ajv: prototype pollution via crafted JSON schema in ajv.validate function",
+      "description": "An issue was discovered in ajv.validate() in Ajv (aka Another JSON Schema Validator) 6.12.2. A carefully crafted JSON schema could be provided that allows execution of other code by prototype pollution. (While untrusted schemas are recommended against, the worst case of an untrusted schema should be a denial of service, not execution of code.)",
+      "severity": "MEDIUM",
+      "cvss": 5.6,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "ajv",
+      "fix": "Update to 6.12.3",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2020-15366"
+      ]
+    },
+    {
+      "id": "CVE-2025-69873",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "ajv: ReDoS via $data reference",
+      "description": "ajv (Another JSON Schema Validator) before 8.18.0 is vulnerable to Regular Expression Denial of Service (ReDoS) when the $data option is enabled. The pattern keyword accepts runtime data via JSON Pointer syntax ($data reference), which is passed directly to the JavaScript RegExp() constructor without validation. An attacker can inject a malicious regex pattern (e.g., \"^(a|a)*$\") combined with crafted input to cause catastrophic backtracking. A 31-character payload causes approximately 44 seconds of CPU blocking, with each additional character doubling execution time. This enables complete denial of service with a single HTTP request against any API using ajv with $data: true for dynamic schema validation. This issue is also fixed in version 6.14.0.",
+      "severity": "MEDIUM",
+      "cvss": 5.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "ajv",
+      "fix": "Update to 8.18.0, 6.14.0",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2025-69873"
+      ]
+    },
+    {
+      "id": "CVE-2021-3807",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-ansi-regex: Regular expression denial of service (ReDoS) matching ANSI escape codes",
+      "description": "ansi-regex is vulnerable to Inefficient Regular Expression Complexity",
+      "severity": "HIGH",
+      "cvss": 7.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "ansi-regex",
+      "fix": "Update to 6.0.1, 5.0.1, 4.1.1, 3.0.1",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2021-3807"
+      ]
+    },
+    {
+      "id": "CVE-2021-3807",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-ansi-regex: Regular expression denial of service (ReDoS) matching ANSI escape codes",
+      "description": "ansi-regex is vulnerable to Inefficient Regular Expression Complexity",
+      "severity": "HIGH",
+      "cvss": 7.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "ansi-regex",
+      "fix": "Update to 6.0.1, 5.0.1, 4.1.1, 3.0.1",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2021-3807"
+      ]
+    },
+    {
+      "id": "CVE-2021-3807",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-ansi-regex: Regular expression denial of service (ReDoS) matching ANSI escape codes",
+      "description": "ansi-regex is vulnerable to Inefficient Regular Expression Complexity",
+      "severity": "HIGH",
+      "cvss": 7.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "ansi-regex",
+      "fix": "Update to 6.0.1, 5.0.1, 4.1.1, 3.0.1",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2021-3807"
+      ]
+    },
+    {
+      "id": "CVE-2021-43138",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "async: Prototype Pollution in async",
+      "description": "In Async before 2.6.4 and 3.x before 3.2.2, a malicious user can obtain privileges via the mapValues() method, aka lib/internal/iterator.js createObjectIterator prototype pollution.",
+      "severity": "HIGH",
+      "cvss": 7.8,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "async",
+      "fix": "Update to 3.2.2, 2.6.4",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2021-43138"
+      ]
+    },
+    {
+      "id": "CVE-2023-45133",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "babel: arbitrary code execution",
+      "description": "Babel is a compiler for writingJavaScript. In `@babel/traverse` prior to versions 7.23.2 and 8.0.0-alpha.4 and all versions of `babel-traverse`, using Babel to compile code that was specifically crafted by an attacker can lead to arbitrary code execution during compilation, when using plugins that rely on the `path.evaluate()`or `path.evaluateTruthy()` internal Babel methods. Known affected plugins are `@babel/plugin-transform-runtime`; `@babel/preset-env` when using its `useBuiltIns` option; and any \"polyfill provider\" plugin that depends on `@babel/helper-define-polyfill-provider`, such as `babel-plugin-polyfill-corejs3`, `babel-plugin-polyfill-corejs2`, `babel-plugin-polyfill-es-shims`, `babel-plugin-polyfill-regenerator`. No other plugins under the `@babel/` namespace are impacted, but third-party plugins might be. Users that only compile trusted code are not impacted. The vulnerability has been fixed in `@babel/traverse@7.23.2` and `@babel/traverse@8.0.0-alpha.4`. Those who cannot upgrade `@babel/traverse` and are using one of the affected packages mentioned above should upgrade them to their latest version to avoid triggering the vulnerable code path in affected `@babel/traverse` versions: `@babel/plugin-transform-runtime` v7.23.2, `@babel/preset-env` v7.23.2, `@babel/helper-define-polyfill-provider` v0.4.3, `babel-plugin-polyfill-corejs2` v0.4.6, `babel-plugin-polyfill-corejs3` v0.8.5, `babel-plugin-polyfill-es-shims` v0.10.0, `babel-plugin-polyfill-regenerator` v0.5.3.",
+      "severity": "CRITICAL",
+      "cvss": 8.8,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "babel-traverse",
+      "fix": "Update to 7.23.2",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2023-45133"
+      ]
+    },
+    {
+      "id": "CVE-2020-8244",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-bl: buffer over-read vulnerability leads to corrupted BufferList which can result in uninitialized memory being leaked",
+      "description": "A buffer over-read vulnerability exists in bl <4.0.3, <3.0.1, <2.2.1, and <1.2.3 which could allow an attacker to supply user input (even typed) that if it ends up in consume() argument and can become negative, the BufferList state can be corrupted, tricking it into exposing uninitialized memory via regular .slice() calls.",
+      "severity": "MEDIUM",
+      "cvss": 6.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "bl",
+      "fix": "Update to 1.2.3, 2.2.1, 3.0.1, 4.0.3",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2020-8244"
+      ]
+    },
+    {
+      "id": "CVE-2024-45590",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "body-parser: Denial of Service Vulnerability in body-parser",
+      "description": "body-parser is Node.js body parsing middleware. body-parser <1.20.3 is vulnerable to denial of service when url encoding is enabled. A malicious actor using a specially crafted payload could flood the server with a large number of requests, resulting in denial of service. This issue is patched in 1.20.3.",
+      "severity": "HIGH",
+      "cvss": 7.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "body-parser",
+      "fix": "Update to 1.20.3",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2024-45590"
+      ]
+    },
+    {
+      "id": "CVE-2025-5889",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "brace-expansion: juliangruber brace-expansion index.js expand redos",
+      "description": "A vulnerability was found in juliangruber brace-expansion up to 1.1.11/2.0.1/3.0.0/4.0.0. It has been rated as problematic. Affected by this issue is the function expand of the file index.js. The manipulation leads to inefficient regular expression complexity. The attack may be launched remotely. The complexity of an attack is rather high. The exploitation is known to be difficult. The exploit has been disclosed to the public and may be used. Upgrading to version 1.1.12, 2.0.2, 3.0.1 and 4.0.1 is able to address this issue. The name of the patch is a5b98a4f30d7813266b221435e1eaaf25a1b0ac5. It is recommended to upgrade the affected component.",
+      "severity": "LOW",
+      "cvss": 2.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "brace-expansion",
+      "fix": "Update to 2.0.2, 1.1.12, 3.0.1, 4.0.1",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2025-5889"
+      ]
+    },
+    {
+      "id": "CVE-2024-4068",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "braces: fails to limit the number of characters it can handle",
+      "description": "The NPM package `braces`, versions prior to 3.0.3, fails to limit the number of characters it can handle, which could lead to Memory Exhaustion. In `lib/parse.js,` if a malicious user sends \"imbalanced braces\" as input, the parsing will enter a loop, which will cause the program to start allocating heap memory without freeing it at any moment of the loop. Eventually, the JavaScript heap limit is reached, and the program will crash.",
+      "severity": "HIGH",
+      "cvss": 8.0,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "braces",
+      "fix": "Update to 3.0.3",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2024-4068"
+      ]
+    },
+    {
+      "id": "CVE-2020-7610",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "bson: Deserialization of Untrusted Data could result in Code injection or Excessive CPU load",
+      "description": "All versions of bson before 1.1.4 are vulnerable to Deserialization of Untrusted Data. The package will ignore an unknown value for an object's _bsotype, leading to cases where an object is serialized as a document rather than the intended BSON type.",
+      "severity": "CRITICAL",
+      "cvss": 9.8,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "bson",
+      "fix": "Update to 1.1.4",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2020-7610"
+      ]
+    },
+    {
+      "id": "CVE-2019-2391",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "Incorrect parsing of certain JSON input may result in js-bson not corr ...",
+      "description": "Incorrect parsing of certain JSON input may result in js-bson not correctly serializing BSON. This may cause unexpected application behaviour including data disclosure. This issue affects: MongoDB Inc. js-bson library version 1.1.3 and prior to.",
+      "severity": "MEDIUM",
+      "cvss": 5.4,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "bson",
+      "fix": "Update to 1.1.4",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2019-2391"
+      ]
+    },
+    {
+      "id": "CVE-2024-47764",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "cookie: cookie accepts cookie name, path, and domain with out of bounds characters",
+      "description": "cookie is a basic HTTP cookie parser and serializer for HTTP servers. The cookie name could be used to set other fields of the cookie, resulting in an unexpected cookie value. A similar escape can be used for path and domain, which could be abused to alter other fields of the cookie. Upgrade to 0.7.0, which updates the validation for name, path, and domain.",
+      "severity": "LOW",
+      "cvss": 2.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "cookie",
+      "fix": "Update to 0.7.0",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2024-47764"
+      ]
+    },
+    {
+      "id": "CVE-2024-47764",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "cookie: cookie accepts cookie name, path, and domain with out of bounds characters",
+      "description": "cookie is a basic HTTP cookie parser and serializer for HTTP servers. The cookie name could be used to set other fields of the cookie, resulting in an unexpected cookie value. A similar escape can be used for path and domain, which could be abused to alter other fields of the cookie. Upgrade to 0.7.0, which updates the validation for name, path, and domain.",
+      "severity": "LOW",
+      "cvss": 2.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "cookie",
+      "fix": "Update to 0.7.0",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2024-47764"
+      ]
+    },
+    {
+      "id": "CVE-2024-21538",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "cross-spawn: regular expression denial of service",
+      "description": "Versions of the package cross-spawn before 6.0.6, from 7.0.0 and before 7.0.5 are vulnerable to Regular Expression Denial of Service (ReDoS) due to improper input sanitization. An attacker can increase the CPU usage and crash the program by crafting a very large and well crafted string.",
+      "severity": "HIGH",
+      "cvss": 8.0,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "cross-spawn",
+      "fix": "Update to 7.0.5, 6.0.6",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2024-21538"
+      ]
+    },
+    {
+      "id": "CVE-2024-21538",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "cross-spawn: regular expression denial of service",
+      "description": "Versions of the package cross-spawn before 6.0.6, from 7.0.0 and before 7.0.5 are vulnerable to Regular Expression Denial of Service (ReDoS) due to improper input sanitization. An attacker can increase the CPU usage and crash the program by crafting a very large and well crafted string.",
+      "severity": "HIGH",
+      "cvss": 8.0,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "cross-spawn",
+      "fix": "Update to 7.0.5, 6.0.6",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2024-21538"
+      ]
+    },
+    {
+      "id": "CVE-2017-20165",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "A vulnerability classified as problematic has been found in debug-js d ...",
+      "description": "A vulnerability classified as problematic has been found in debug-js debug up to 3.0.x. This affects the function useColors of the file src/node.js. The manipulation of the argument str leads to inefficient regular expression complexity. Upgrading to version 3.1.0 is able to address this issue. The identifier of the patch is c38a0166c266a679c8de012d4eaccec3f944e685. It is recommended to upgrade the affected component. The identifier VDB-217665 was assigned to this vulnerability.",
+      "severity": "HIGH",
+      "cvss": 7.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "debug",
+      "fix": "Update to 3.1.0, 2.6.9",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2017-20165"
+      ]
+    },
+    {
+      "id": "CVE-2017-16137",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-debug: Regular expression Denial of Service",
+      "description": "The debug module is vulnerable to regular expression denial of service when untrusted user input is passed into the o formatter. It takes around 50k characters to block for 2 seconds making this a low severity issue.",
+      "severity": "LOW",
+      "cvss": 5.3,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "debug",
+      "fix": "Update to 2.6.9, 3.1.0, 3.2.7, 4.3.1",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2017-16137"
+      ]
+    },
+    {
+      "id": "CVE-2017-16137",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-debug: Regular expression Denial of Service",
+      "description": "The debug module is vulnerable to regular expression denial of service when untrusted user input is passed into the o formatter. It takes around 50k characters to block for 2 seconds making this a low severity issue.",
+      "severity": "LOW",
+      "cvss": 5.3,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "debug",
+      "fix": "Update to 2.6.9, 3.1.0, 3.2.7, 4.3.1",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2017-16137"
+      ]
+    },
+    {
+      "id": "CVE-2022-38900",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "decode-uri-component: improper input validation resulting in DoS",
+      "description": "decode-uri-component 0.2.0 is vulnerable to Improper Input Validation resulting in DoS.",
+      "severity": "HIGH",
+      "cvss": 7.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "decode-uri-component",
+      "fix": "Update to 0.2.1",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2022-38900"
+      ]
+    },
+    {
+      "id": "CVE-2022-24434",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "dicer: nodejs service crash by sending a crafted payload",
+      "description": "This affects all versions of package dicer. A malicious attacker can send a modified form to server, and crash the nodejs service. An attacker could sent the payload again and again so that the service continuously crashes.",
+      "severity": "HIGH",
+      "cvss": 7.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "dicer",
+      "fix": "Update to latest",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2022-24434"
+      ]
+    },
+    {
+      "id": "GHSA-h6ch-v84p-w6p9",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "Regular Expression Denial of Service (ReDoS)",
+      "description": "A vulnerability was found in diff before v3.5.0, the affected versions of this package are vulnerable to Regular Expression Denial of Service (ReDoS) attacks.",
+      "severity": "HIGH",
+      "cvss": 8.0,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "diff",
+      "fix": "Update to 3.5.0",
+      "references": [
+        "https://github.com/advisories/GHSA-h6ch-v84p-w6p9"
+      ]
+    },
+    {
+      "id": "CVE-2026-24001",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "jsdiff: denial of service vulnerability in parsePatch and applyPatch",
+      "description": "jsdiff is a JavaScript text differencing implementation. Prior to versions 8.0.3, 5.2.2, 4.0.4, and 3.5.1, attempting to parse a patch whose filename headers contain the line break characters `\\r`, `\\u2028`, or `\\u2029` can cause the `parsePatch` method to enter an infinite loop. It then consumes memory without limit until the process crashes due to running out of memory. Applications are therefore likely to be vulnerable to a denial-of-service attack if they call `parsePatch` with a user-provided patch as input. A large payload is not needed to trigger the vulnerability, so size limits on user input do not provide any protection. Furthermore, some applications may be vulnerable even when calling `parsePatch` on a patch generated by the application itself if the user is nonetheless able to control the filename headers (e.g. by directly providing the filenames of the files to be diffed). The `applyPatch` method is similarly affected if (and only if) called with a string representation of a patch as an argument, since under the hood it parses that string using `parsePatch`. Other methods of the library are unaffected. Finally, a second and lesser interdependent bug - a ReDOS - also exhibits when those same line break characters are present in a patch's *patch* header (also known as its \"leading garbage\"). A maliciously-crafted patch header of length *n* can take `parsePatch` O(*n*\u00b3) time to parse. Versions 8.0.3, 5.2.2, 4.0.4, and 3.5.1 contain a fix. As a workaround, do not attempt to parse patches that contain any of these characters: `\\r`, `\\u2028`, or `\\u2029`.",
+      "severity": "LOW",
+      "cvss": 7.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "diff",
+      "fix": "Update to 8.0.3, 5.2.2, 4.0.4, 3.5.1",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2026-24001"
+      ]
+    },
+    {
+      "id": "CVE-2021-4264",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "dustjs-linkedin vulnerable to Prototype Pollution",
+      "description": "A vulnerability was found in LinkedIn dustjs up to 2.x and classified as problematic. Affected by this issue is some unknown functionality. The manipulation leads to improperly controlled modification of object prototype attributes ('prototype pollution'). The attack may be launched remotely. The exploit has been disclosed to the public and may be used. Upgrading to version 3.0.0 is able to address this issue. The name of the patch is ddb6523832465d38c9d80189e9de60519ac307c3. It is recommended to upgrade the affected component. The identifier of this vulnerability is VDB-216464.",
+      "severity": "HIGH",
+      "cvss": 8.8,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "dustjs-linkedin",
+      "fix": "Update to 3.0.0",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2021-4264"
+      ]
+    },
+    {
+      "id": "CVE-2017-1000228",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs ejs versions older than 2.5.3 is vulnerable to remote code exec ...",
+      "description": "nodejs ejs versions older than 2.5.3 is vulnerable to remote code execution due to weak input validation in ejs.renderFile() function",
+      "severity": "CRITICAL",
+      "cvss": 9.8,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "ejs",
+      "fix": "Update to 2.5.5",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2017-1000228"
+      ]
+    },
+    {
+      "id": "CVE-2022-29078",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "ejs: server-side template injection in outputFunctionName",
+      "description": "The ejs (aka Embedded JavaScript templates) package 3.1.6 for Node.js allows server-side template injection in settings[view options][outputFunctionName]. This is parsed as an internal option, and overwrites the outputFunctionName option with an arbitrary OS command (which is executed upon template compilation).",
+      "severity": "CRITICAL",
+      "cvss": 9.8,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "ejs",
+      "fix": "Update to 3.1.7",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2022-29078"
+      ]
+    },
+    {
+      "id": "CVE-2017-1000189",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-ejs: Denial of Service via renderFile() by overriding localNames",
+      "description": "nodejs ejs version older than 2.5.5 is vulnerable to a denial-of-service due to weak input validation in the ejs.renderFile()",
+      "severity": "HIGH",
+      "cvss": 7.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "ejs",
+      "fix": "Update to 2.5.5",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2017-1000189"
+      ]
+    },
+    {
+      "id": "CVE-2017-1000188",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-ejs: Cross-site scripting via ejs.renderFile()",
+      "description": "nodejs ejs version older than 2.5.5 is vulnerable to a Cross-site-scripting in the ejs.renderFile() resulting in code injection",
+      "severity": "MEDIUM",
+      "cvss": 6.1,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "ejs",
+      "fix": "Update to 2.5.5",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2017-1000188"
+      ]
+    },
+    {
+      "id": "CVE-2024-33883",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "The ejs (aka Embedded JavaScript templates) package before 3.1.10 for  ...",
+      "description": "The ejs (aka Embedded JavaScript templates) package before 3.1.10 for Node.js lacks certain pollution protection.",
+      "severity": "MEDIUM",
+      "cvss": 5.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "ejs",
+      "fix": "Update to 3.1.10",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2024-33883"
+      ]
+    },
+    {
+      "id": "CVE-2017-1000228",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs ejs versions older than 2.5.3 is vulnerable to remote code exec ...",
+      "description": "nodejs ejs versions older than 2.5.3 is vulnerable to remote code execution due to weak input validation in ejs.renderFile() function",
+      "severity": "CRITICAL",
+      "cvss": 9.8,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "ejs",
+      "fix": "Update to 2.5.5",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2017-1000228"
+      ]
+    },
+    {
+      "id": "CVE-2022-29078",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "ejs: server-side template injection in outputFunctionName",
+      "description": "The ejs (aka Embedded JavaScript templates) package 3.1.6 for Node.js allows server-side template injection in settings[view options][outputFunctionName]. This is parsed as an internal option, and overwrites the outputFunctionName option with an arbitrary OS command (which is executed upon template compilation).",
+      "severity": "CRITICAL",
+      "cvss": 9.8,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "ejs",
+      "fix": "Update to 3.1.7",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2022-29078"
+      ]
+    },
+    {
+      "id": "CVE-2017-1000189",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-ejs: Denial of Service via renderFile() by overriding localNames",
+      "description": "nodejs ejs version older than 2.5.5 is vulnerable to a denial-of-service due to weak input validation in the ejs.renderFile()",
+      "severity": "HIGH",
+      "cvss": 7.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "ejs",
+      "fix": "Update to 2.5.5",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2017-1000189"
+      ]
+    },
+    {
+      "id": "CVE-2017-1000188",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-ejs: Cross-site scripting via ejs.renderFile()",
+      "description": "nodejs ejs version older than 2.5.5 is vulnerable to a Cross-site-scripting in the ejs.renderFile() resulting in code injection",
+      "severity": "MEDIUM",
+      "cvss": 6.1,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "ejs",
+      "fix": "Update to 2.5.5",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2017-1000188"
+      ]
+    },
+    {
+      "id": "CVE-2024-33883",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "The ejs (aka Embedded JavaScript templates) package before 3.1.10 for  ...",
+      "description": "The ejs (aka Embedded JavaScript templates) package before 3.1.10 for Node.js lacks certain pollution protection.",
+      "severity": "MEDIUM",
+      "cvss": 5.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "ejs",
+      "fix": "Update to 3.1.10",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2024-33883"
+      ]
+    },
+    {
+      "id": "CVE-2024-29041",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "express: cause malformed URLs to be evaluated",
+      "description": "Express.js minimalist web framework for node. Versions of Express.js prior to 4.19.0 and all pre-release alpha and beta versions of 5.0 are affected by an open redirect vulnerability using malformed URLs. When a user of Express performs a redirect using a user-provided URL Express performs an encode [using `encodeurl`](https://github.com/pillarjs/encodeurl) on the contents before passing it to the `location` header. This can cause malformed URLs to be evaluated in unexpected ways by common redirect allow list implementations in Express applications, leading to an Open Redirect via bypass of a properly implemented allow list. The main method impacted is `res.location()` but this is also called from within `res.redirect()`. The vulnerability is fixed in 4.19.2 and 5.0.0-beta.3.",
+      "severity": "MEDIUM",
+      "cvss": 5.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "express",
+      "fix": "Update to 4.19.2, 5.0.0-beta.3",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2024-29041"
+      ]
+    },
+    {
+      "id": "CVE-2024-43796",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "express: Improper Input Handling in Express Redirects",
+      "description": "Express.js minimalist web framework for node. In express < 4.20.0, passing untrusted user input - even after sanitizing it - to response.redirect() may execute untrusted code. This issue is patched in express 4.20.0.",
+      "severity": "LOW",
+      "cvss": 4.7,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "express",
+      "fix": "Update to 4.20.0, 5.0.0",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2024-43796"
+      ]
+    },
+    {
+      "id": "CVE-2020-7699",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "Prototype Pollution in express-fileupload",
+      "description": "This affects the package express-fileupload before 1.1.8. If the parseNested option is enabled, sending a corrupt HTTP request can lead to denial of service or arbitrary code execution.",
+      "severity": "CRITICAL",
+      "cvss": 9.8,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "express-fileupload",
+      "fix": "Update to 1.1.9",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2020-7699"
+      ]
+    },
+    {
+      "id": "CVE-2022-27261",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "Express-FileUpload Arbitrary File Overwrite",
+      "description": "An arbitrary file write vulnerability in Express-FileUpload v1.3.1 allows attackers to upload multiple files with the same name, causing an overwrite of files in the web application server.",
+      "severity": "HIGH",
+      "cvss": 7.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "express-fileupload",
+      "fix": "Update to latest",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2022-27261"
+      ]
+    },
+    {
+      "id": "GHSA-q3w9-g74q-vp5f",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "Denial of Service in express-fileupload",
+      "description": "Versions of `express-fileupload` prior to 1.1.6-alpha.6 are vulnerable to Denial of Service. The package causes server responses to be delayed (up to 30s in internal testing) if the request contains a large `filename` of `.` characters.\n\n\n\n\n## Recommendation\n\nUpgrade to version 1.1.6-alpha.6 or later.",
+      "severity": "LOW",
+      "cvss": 2.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "express-fileupload",
+      "fix": "Update to 1.1.6-alpha.6",
+      "references": [
+        "https://github.com/advisories/GHSA-q3w9-g74q-vp5f"
+      ]
+    },
+    {
+      "id": "CVE-2025-7783",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "form-data: Unsafe random function in form-data",
+      "description": "Use of Insufficiently Random Values vulnerability in form-data allows HTTP Parameter Pollution (HPP). This vulnerability is associated with program files lib/form_data.Js.\n\nThis issue affects form-data: < 2.5.4, 3.0.0 - 3.0.3, 4.0.0 - 4.0.3.",
+      "severity": "CRITICAL",
+      "cvss": 9.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "form-data",
+      "fix": "Update to 2.5.4, 3.0.4, 4.0.4",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2025-7783"
+      ]
+    },
+    {
+      "id": "CVE-2017-16119",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-fresh: Regular expression denial of service when parsing crafted user input",
+      "description": "Fresh is a module used by the Express.js framework for HTTP response freshness testing. It is vulnerable to a regular expression denial of service when it is passed specially crafted input to parse. This causes the event loop to be blocked causing a denial of service condition.",
+      "severity": "HIGH",
+      "cvss": 7.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "fresh",
+      "fix": "Update to 0.5.2",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2017-16119"
+      ]
+    },
+    {
+      "id": "CVE-2019-19919",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-handlebars: prototype pollution leading to remote code execution via crafted payloads",
+      "description": "Versions of handlebars prior to 4.3.0 are vulnerable to Prototype Pollution leading to Remote Code Execution. Templates may alter an Object's __proto__ and __defineGetter__ properties, which may allow an attacker to execute arbitrary code through crafted payloads.",
+      "severity": "CRITICAL",
+      "cvss": 9.8,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "handlebars",
+      "fix": "Update to 4.3.0, 3.0.8",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2019-19919"
+      ]
+    },
+    {
+      "id": "CVE-2021-23369",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-handlebars: Remote code execution when compiling untrusted compile templates with strict:true option",
+      "description": "The package handlebars before 4.7.7 are vulnerable to Remote Code Execution (RCE) when selecting certain compiling options to compile templates coming from an untrusted source.",
+      "severity": "CRITICAL",
+      "cvss": 9.8,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "handlebars",
+      "fix": "Update to 4.7.7",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2021-23369"
+      ]
+    },
+    {
+      "id": "CVE-2021-23383",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-handlebars: Remote code execution when compiling untrusted compile templates with compat:true option",
+      "description": "The package handlebars before 4.7.7 are vulnerable to Prototype Pollution when selecting certain compiling options to compile templates coming from an untrusted source.",
+      "severity": "CRITICAL",
+      "cvss": 9.8,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "handlebars",
+      "fix": "Update to 4.7.7",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2021-23383"
+      ]
+    },
+    {
+      "id": "CVE-2019-20920",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-handlebars: lookup helper fails to properly validate templates allowing for arbitrary JavaScript execution",
+      "description": "Handlebars before 3.0.8 and 4.x before 4.5.3 is vulnerable to Arbitrary Code Execution. The lookup helper fails to properly validate templates, allowing attackers to submit templates that execute arbitrary JavaScript. This can be used to run arbitrary code on a server processing Handlebars templates or in a victim's browser (effectively serving as XSS).",
+      "severity": "HIGH",
+      "cvss": 8.1,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "handlebars",
+      "fix": "Update to 3.0.8, 4.5.3",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2019-20920"
+      ]
+    },
+    {
+      "id": "CVE-2019-20922",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-handlebars: an endless loop while processing specially-crafted templates leads to DoS",
+      "description": "Handlebars before 4.4.5 allows Regular Expression Denial of Service (ReDoS) because of eager matching. The parser may be forced into an endless loop while processing crafted templates. This may allow attackers to exhaust system resources.",
+      "severity": "HIGH",
+      "cvss": 7.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "handlebars",
+      "fix": "Update to 4.4.5",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2019-20922"
+      ]
+    },
+    {
+      "id": "GHSA-2cf5-4w76-r9qv",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "Arbitrary Code Execution in handlebars",
+      "description": "Versions of `handlebars` prior to 3.0.8 or 4.5.2 are vulnerable to Arbitrary Code Execution. The package's lookup helper fails to properly validate templates, allowing attackers to submit templates that execute arbitrary JavaScript in the system. It can be used to run arbitrary code in a server processing Handlebars templates or on a victim's browser (effectively serving as Cross-Site Scripting).\n\nThe following template can be used to demonstrate the vulnerability:  \n```{{#with \"constructor\"}}\n\t{{#with split as |a|}}\n\t\t{{pop (push \"alert('Vulnerable Handlebars JS');\")}}\n\t\t{{#with (concat (lookup join (slice 0 1)))}}\n\t\t\t{{#each (slice 2 3)}}\n\t\t\t\t{{#with (apply 0 a)}}\n\t\t\t\t\t{{.}}\n\t\t\t\t{{/with}}\n\t\t\t{{/each}}\n\t\t{{/with}}\n\t{{/with}}\n{{/with}}```\n\n\n## Recommendation\n\nUpgrade to version 3.0.8, 4.5.2 or later.",
+      "severity": "HIGH",
+      "cvss": 8.0,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "handlebars",
+      "fix": "Update to 3.0.8, 4.5.2",
+      "references": [
+        "https://github.com/advisories/GHSA-2cf5-4w76-r9qv"
+      ]
+    },
+    {
+      "id": "GHSA-g9r4-xpmj-mj65",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "Prototype Pollution in handlebars",
+      "description": "Versions of `handlebars` prior to 3.0.8 or 4.5.3 are vulnerable to prototype pollution. It is possible to add or modify properties to the Object prototype through a malicious template. This may allow attackers to crash the application or execute Arbitrary Code in specific conditions.\n\n\n## Recommendation\n\nUpgrade to version 3.0.8, 4.5.3 or later.",
+      "severity": "HIGH",
+      "cvss": 8.0,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "handlebars",
+      "fix": "Update to 3.0.8, 4.5.3",
+      "references": [
+        "https://github.com/advisories/GHSA-g9r4-xpmj-mj65"
+      ]
+    },
+    {
+      "id": "GHSA-q2c6-c6pm-g3gh",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "Arbitrary Code Execution in handlebars",
+      "description": "Versions of `handlebars` prior to 3.0.8 or 4.5.3 are vulnerable to Arbitrary Code Execution. The package's lookup helper fails to properly validate templates, allowing attackers to submit templates that execute arbitrary JavaScript in the system. It is due to an incomplete fix for a [previous issue](https://www.npmjs.com/advisories/1316). This vulnerability can be used to run arbitrary code in a server processing Handlebars templates or on a victim's browser (effectively serving as Cross-Site Scripting).\n\n\n## Recommendation\n\nUpgrade to version 3.0.8, 4.5.3 or later.",
+      "severity": "HIGH",
+      "cvss": 8.0,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "handlebars",
+      "fix": "Update to 3.0.8, 4.5.3",
+      "references": [
+        "https://github.com/advisories/GHSA-q2c6-c6pm-g3gh"
+      ]
+    },
+    {
+      "id": "GHSA-q42p-pg8m-cqh6",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "Prototype Pollution in handlebars",
+      "description": "Versions of `handlebars` prior to 4.0.14 are vulnerable to Prototype Pollution. Templates may alter an Objects' prototype, thus allowing an attacker to execute arbitrary code on the server.\n\n\n## Recommendation\n\nFor handlebars 4.1.x upgrade to 4.1.2 or later.\nFor handlebars 4.0.x upgrade to 4.0.14 or later.",
+      "severity": "HIGH",
+      "cvss": 8.0,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "handlebars",
+      "fix": "Update to 4.1.2, 4.0.14, 3.0.7",
+      "references": [
+        "https://github.com/advisories/GHSA-q42p-pg8m-cqh6"
+      ]
+    },
+    {
+      "id": "GHSA-f52g-6jhx-586p",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "Denial of Service in handlebars",
+      "description": "Affected versions of `handlebars` are vulnerable to Denial of Service. The package's parser may be forced into an endless loop while processing specially-crafted templates. This may allow attackers to exhaust system resources leading to Denial of Service.\n\n\n## Recommendation\n\nUpgrade to version 4.4.5 or later.",
+      "severity": "MEDIUM",
+      "cvss": 5.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "handlebars",
+      "fix": "Update to 4.4.5",
+      "references": [
+        "https://github.com/advisories/GHSA-f52g-6jhx-586p"
+      ]
+    },
+    {
+      "id": "NSWG-ECO-519",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "Denial of Service",
+      "description": "Crash Node.js process from handlebars using a small and simple source",
+      "severity": "MEDIUM",
+      "cvss": 5.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "handlebars",
+      "fix": "Update to >=4.6.0",
+      "references": [
+        "https://hackerone.com/reports/726364"
+      ]
+    },
+    {
+      "id": "CVE-2019-19919",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-handlebars: prototype pollution leading to remote code execution via crafted payloads",
+      "description": "Versions of handlebars prior to 4.3.0 are vulnerable to Prototype Pollution leading to Remote Code Execution. Templates may alter an Object's __proto__ and __defineGetter__ properties, which may allow an attacker to execute arbitrary code through crafted payloads.",
+      "severity": "CRITICAL",
+      "cvss": 9.8,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "handlebars",
+      "fix": "Update to 4.3.0, 3.0.8",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2019-19919"
+      ]
+    },
+    {
+      "id": "CVE-2021-23369",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-handlebars: Remote code execution when compiling untrusted compile templates with strict:true option",
+      "description": "The package handlebars before 4.7.7 are vulnerable to Remote Code Execution (RCE) when selecting certain compiling options to compile templates coming from an untrusted source.",
+      "severity": "CRITICAL",
+      "cvss": 9.8,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "handlebars",
+      "fix": "Update to 4.7.7",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2021-23369"
+      ]
+    },
+    {
+      "id": "CVE-2021-23383",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-handlebars: Remote code execution when compiling untrusted compile templates with compat:true option",
+      "description": "The package handlebars before 4.7.7 are vulnerable to Prototype Pollution when selecting certain compiling options to compile templates coming from an untrusted source.",
+      "severity": "CRITICAL",
+      "cvss": 9.8,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "handlebars",
+      "fix": "Update to 4.7.7",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2021-23383"
+      ]
+    },
+    {
+      "id": "CVE-2019-20920",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-handlebars: lookup helper fails to properly validate templates allowing for arbitrary JavaScript execution",
+      "description": "Handlebars before 3.0.8 and 4.x before 4.5.3 is vulnerable to Arbitrary Code Execution. The lookup helper fails to properly validate templates, allowing attackers to submit templates that execute arbitrary JavaScript. This can be used to run arbitrary code on a server processing Handlebars templates or in a victim's browser (effectively serving as XSS).",
+      "severity": "HIGH",
+      "cvss": 8.1,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "handlebars",
+      "fix": "Update to 3.0.8, 4.5.3",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2019-20920"
+      ]
+    },
+    {
+      "id": "CVE-2019-20922",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-handlebars: an endless loop while processing specially-crafted templates leads to DoS",
+      "description": "Handlebars before 4.4.5 allows Regular Expression Denial of Service (ReDoS) because of eager matching. The parser may be forced into an endless loop while processing crafted templates. This may allow attackers to exhaust system resources.",
+      "severity": "HIGH",
+      "cvss": 7.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "handlebars",
+      "fix": "Update to 4.4.5",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2019-20922"
+      ]
+    },
+    {
+      "id": "GHSA-2cf5-4w76-r9qv",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "Arbitrary Code Execution in handlebars",
+      "description": "Versions of `handlebars` prior to 3.0.8 or 4.5.2 are vulnerable to Arbitrary Code Execution. The package's lookup helper fails to properly validate templates, allowing attackers to submit templates that execute arbitrary JavaScript in the system. It can be used to run arbitrary code in a server processing Handlebars templates or on a victim's browser (effectively serving as Cross-Site Scripting).\n\nThe following template can be used to demonstrate the vulnerability:  \n```{{#with \"constructor\"}}\n\t{{#with split as |a|}}\n\t\t{{pop (push \"alert('Vulnerable Handlebars JS');\")}}\n\t\t{{#with (concat (lookup join (slice 0 1)))}}\n\t\t\t{{#each (slice 2 3)}}\n\t\t\t\t{{#with (apply 0 a)}}\n\t\t\t\t\t{{.}}\n\t\t\t\t{{/with}}\n\t\t\t{{/each}}\n\t\t{{/with}}\n\t{{/with}}\n{{/with}}```\n\n\n## Recommendation\n\nUpgrade to version 3.0.8, 4.5.2 or later.",
+      "severity": "HIGH",
+      "cvss": 8.0,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "handlebars",
+      "fix": "Update to 3.0.8, 4.5.2",
+      "references": [
+        "https://github.com/advisories/GHSA-2cf5-4w76-r9qv"
+      ]
+    },
+    {
+      "id": "GHSA-g9r4-xpmj-mj65",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "Prototype Pollution in handlebars",
+      "description": "Versions of `handlebars` prior to 3.0.8 or 4.5.3 are vulnerable to prototype pollution. It is possible to add or modify properties to the Object prototype through a malicious template. This may allow attackers to crash the application or execute Arbitrary Code in specific conditions.\n\n\n## Recommendation\n\nUpgrade to version 3.0.8, 4.5.3 or later.",
+      "severity": "HIGH",
+      "cvss": 8.0,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "handlebars",
+      "fix": "Update to 3.0.8, 4.5.3",
+      "references": [
+        "https://github.com/advisories/GHSA-g9r4-xpmj-mj65"
+      ]
+    },
+    {
+      "id": "GHSA-q2c6-c6pm-g3gh",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "Arbitrary Code Execution in handlebars",
+      "description": "Versions of `handlebars` prior to 3.0.8 or 4.5.3 are vulnerable to Arbitrary Code Execution. The package's lookup helper fails to properly validate templates, allowing attackers to submit templates that execute arbitrary JavaScript in the system. It is due to an incomplete fix for a [previous issue](https://www.npmjs.com/advisories/1316). This vulnerability can be used to run arbitrary code in a server processing Handlebars templates or on a victim's browser (effectively serving as Cross-Site Scripting).\n\n\n## Recommendation\n\nUpgrade to version 3.0.8, 4.5.3 or later.",
+      "severity": "HIGH",
+      "cvss": 8.0,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "handlebars",
+      "fix": "Update to 3.0.8, 4.5.3",
+      "references": [
+        "https://github.com/advisories/GHSA-q2c6-c6pm-g3gh"
+      ]
+    },
+    {
+      "id": "GHSA-f52g-6jhx-586p",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "Denial of Service in handlebars",
+      "description": "Affected versions of `handlebars` are vulnerable to Denial of Service. The package's parser may be forced into an endless loop while processing specially-crafted templates. This may allow attackers to exhaust system resources leading to Denial of Service.\n\n\n## Recommendation\n\nUpgrade to version 4.4.5 or later.",
+      "severity": "MEDIUM",
+      "cvss": 5.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "handlebars",
+      "fix": "Update to 4.4.5",
+      "references": [
+        "https://github.com/advisories/GHSA-f52g-6jhx-586p"
+      ]
+    },
+    {
+      "id": "NSWG-ECO-519",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "Denial of Service",
+      "description": "Crash Node.js process from handlebars using a small and simple source",
+      "severity": "MEDIUM",
+      "cvss": 5.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "handlebars",
+      "fix": "Update to >=4.6.0",
+      "references": [
+        "https://hackerone.com/reports/726364"
+      ]
+    },
+    {
+      "id": "CVE-2021-32822",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "Insertion of Sensitive Information into Externally-Accessible File or Directory and Exposure of Sensitive Information to an Unauthorized Actor in hbs",
+      "description": "The npm hbs package is an Express view engine wrapper for Handlebars. Depending on usage, users of hbs may be vulnerable to a file disclosure vulnerability. There is currently no patch for this vulnerability. hbs mixes pure template data with engine configuration options through the Express render API. By overwriting internal configuration options a file disclosure vulnerability may be triggered in downstream applications. For an example PoC see the referenced GHSL-2021-020.",
+      "severity": "MEDIUM",
+      "cvss": 5.3,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "hbs",
+      "fix": "Update to latest",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2021-32822"
+      ]
+    },
+    {
+      "id": "CVE-2020-26237",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-highlight-js: prototype pollution via a crafted HTML code block",
+      "description": "Highlight.js is a syntax highlighter written in JavaScript. Highlight.js versions before 9.18.2 and 10.1.2 are vulnerable to Prototype Pollution. A malicious HTML code block can be crafted that will result in prototype pollution of the base object's prototype during highlighting. If you allow users to insert custom HTML code blocks into your page/app via parsing Markdown code blocks (or similar) and do not filter the language names the user can provide you may be vulnerable. The pollution should just be harmless data but this can cause problems for applications not expecting these properties to exist and can result in strange behavior or application crashes, i.e. a potential DOS vector. If your website or application does not render user provided data it should be unaffected. Versions 9.18.2 and 10.1.2 and newer include fixes for this vulnerability. If you are using version 7 or 8 you are encouraged to upgrade to a newer release.",
+      "severity": "MEDIUM",
+      "cvss": 8.7,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "highlight.js",
+      "fix": "Update to 9.18.2, 10.1.2",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2020-26237"
+      ]
+    },
+    {
+      "id": "GHSA-7wwv-vh3v-89cq",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "ReDOS vulnerabities: multiple grammars",
+      "description": "### Impact: Potential ReDOS vulnerabilities (exponential and polynomial RegEx backtracking)\n\n[oswasp](https://owasp.org/www-community/attacks/Regular_expression_Denial_of_Service_-_ReDoS): \n\n> The Regular expression Denial of Service (ReDoS) is a Denial of Service attack, that exploits the fact that most Regular Expression implementations may reach extreme situations that cause them to work very slowly (exponentially related to input size). An attacker can then cause a program using a Regular Expression to enter these extreme situations and then hang for a very long time.\n\nIf are you are using Highlight.js to highlight user-provided data you are possibly vulnerable.  On the client-side (in a browser or Electron environment) risks could include lengthy freezes or crashes... On the server-side infinite freezes could occur... effectively preventing users from accessing your app or service (ie, Denial of Service).\n\nThis is an issue with grammars shipped with the parser (and potentially 3rd party grammars also), not the parser itself. If you are using Highlight.js with any of the following grammars you are vulnerable.  If you are using `highlightAuto` to detect the language (and have any of these grammars registered) you are vulnerable. Exponential grammars (C, Perl, JavaScript) are auto-registered when using the common grammar subset/library `require('highlight.js/lib/common')` as of 10.4.0 - see https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.4.0/build/highlight.js\n\nAll versions prior to 10.4.1 are vulnerable, including version 9.18.5. \n\n**Grammars with exponential backtracking issues:**\n\n  - c-like (c, cpp, arduino)\n  - handlebars (htmlbars)\n  - gams\n  - perl\n  - jboss-cli\n  - r\n  - erlang-repl\n  - powershell\n  - routeros\n  - livescript (10.4.0 and 9.18.5 included this fix)\n  - javascript & typescript (10.4.0 included partial fixes)\n\nAnd of course any aliases of those languages have the same issue. ie: `hpp` is no safer than `cpp`.\n\n**Grammars with polynomial backtracking issues:**\n\n- kotlin\n- gcode\n- d\n- aspectj\n- moonscript\n- coffeescript/livescript\n- csharp\n- scilab\n- crystal\n- elixir\n- basic\n- ebnf\n- ruby\n- fortran/irpf90\n- livecodeserver\n- yaml\n- x86asm\n- dsconfig\n- markdown\n- ruleslanguage\n- xquery\n- sqf\n\nAnd again: any aliases of those languages have the same issue. ie: `ruby` and `rb` share the same ruby issues.\n\n\n### Patches\n\n- Version 10.4.1 resolves these vulnerabilities.  Please upgrade.\n\n### Workarounds / Mitigations\n\n- Discontinue use the affected grammars. (or perhaps use only those with poly vs exponential issues)\n- Attempt cherry-picking the grammar fixes into older versions...\n- Attempt using newer CDN versions of any affected languages.  (ie using an older CDN version of the library with newer CDN grammars).  Your mileage may vary.\n\n### References\n\n- https://owasp.org/www-community/attacks/Regular_expression_Denial_of_Service_-_ReDoS\n\n### For more information\n\nIf you have any questions or comments about this advisory:\n* Open an issue: https://github.com/highlightjs/highlight.js/issues\n* Email us at [security@highlightjs.com](mailto:security@highlightjs.com)",
+      "severity": "MEDIUM",
+      "cvss": 5.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "highlight.js",
+      "fix": "Update to 10.4.1",
+      "references": [
+        "https://github.com/advisories/GHSA-7wwv-vh3v-89cq"
+      ]
+    },
+    {
+      "id": "CVE-2021-23362",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-hosted-git-info: Regular Expression denial of service via shortcutMatch in fromUrl()",
+      "description": "The package hosted-git-info before 3.0.8 are vulnerable to Regular Expression Denial of Service (ReDoS) via regular expression shortcutMatch in the fromUrl function in index.js. The affected regular expression exhibits polynomial worst-case time complexity.",
+      "severity": "MEDIUM",
+      "cvss": 5.3,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "hosted-git-info",
+      "fix": "Update to 2.8.9, 3.0.8",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2021-23362"
+      ]
+    },
+    {
+      "id": "CVE-2020-7788",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-ini: Prototype pollution via malicious INI file",
+      "description": "This affects the package ini before 1.3.6. If an attacker submits a malicious INI file to an application that parses it with ini.parse, they will pollute the prototype on the application. This can be exploited further depending on the context.",
+      "severity": "HIGH",
+      "cvss": 9.8,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "ini",
+      "fix": "Update to 1.3.6",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2020-7788"
+      ]
+    },
+    {
+      "id": "CVE-2020-7788",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-ini: Prototype pollution via malicious INI file",
+      "description": "This affects the package ini before 1.3.6. If an attacker submits a malicious INI file to an application that parses it with ini.parse, they will pollute the prototype on the application. This can be exploited further depending on the context.",
+      "severity": "HIGH",
+      "cvss": 9.8,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "ini",
+      "fix": "Update to 1.3.6",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2020-7788"
+      ]
+    },
+    {
+      "id": "NSWG-ECO-328",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "Cross-Site Scripting (XSS)",
+      "description": "Jquery is a javascript library for DOM traversal and manipulation, event handling, animation, and Ajax. \n\nWhen text/javascript responses are received from cross-origin ajax requests not containing the option `dataType`, the result is executed in `jQuery.globalEval` potentially allowing an attacker to execute arbitrary code on the origin.",
+      "severity": "HIGH",
+      "cvss": 8.0,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "jquery",
+      "fix": "Update to >=3.0.0",
+      "references": []
+    },
+    {
+      "id": "CVE-2015-9251",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "jquery: Cross-site scripting via cross-domain ajax requests",
+      "description": "jQuery before 3.0.0 is vulnerable to Cross-site Scripting (XSS) attacks when a cross-domain Ajax request is performed without the dataType option, causing text/javascript responses to be executed.",
+      "severity": "MEDIUM",
+      "cvss": 6.1,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "jquery",
+      "fix": "Update to 1.12.2, 3.0.0",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2015-9251"
+      ]
+    },
+    {
+      "id": "CVE-2019-11358",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "jquery: Prototype pollution in object's prototype leading to denial of service, remote code execution, or property injection",
+      "description": "jQuery before 3.4.0, as used in Drupal, Backdrop CMS, and other products, mishandles jQuery.extend(true, {}, ...) because of Object.prototype pollution. If an unsanitized source object contained an enumerable __proto__ property, it could extend the native Object.prototype.",
+      "severity": "MEDIUM",
+      "cvss": 6.1,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "jquery",
+      "fix": "Update to >=3.4.0",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2019-11358"
+      ]
+    },
+    {
+      "id": "CVE-2020-11022",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "jquery: Cross-site scripting due to improper injQuery.htmlPrefilter method",
+      "description": "In jQuery versions greater than or equal to 1.2 and before 3.5.0, passing HTML from untrusted sources - even after sanitizing it - to one of jQuery's DOM manipulation methods (i.e. .html(), .append(), and others) may execute untrusted code. This problem is patched in jQuery 3.5.0.",
+      "severity": "MEDIUM",
+      "cvss": 6.1,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "jquery",
+      "fix": "Update to 3.5.0",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2020-11022"
+      ]
+    },
+    {
+      "id": "CVE-2020-11023",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "jquery: Untrusted code execution via <option> tag in HTML passed to DOM manipulation methods",
+      "description": "In jQuery versions greater than or equal to 1.0.3 and before 3.5.0, passing HTML containing <option> elements from untrusted sources - even after sanitizing it - to one of jQuery's DOM manipulation methods (i.e. .html(), .append(), and others) may execute untrusted code. This problem is patched in jQuery 3.5.0.",
+      "severity": "MEDIUM",
+      "cvss": 6.1,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "jquery",
+      "fix": "Update to 3.5.0",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2020-11023"
+      ]
+    },
+    {
+      "id": "CVE-2025-64718",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "js-yaml: js-yaml prototype pollution in merge",
+      "description": "js-yaml is a JavaScript YAML parser and dumper. In js-yaml before 4.1.1 and 3.14.2, it's possible for an attacker to modify the prototype of the result of a parsed yaml document via prototype pollution (`__proto__`). All users who parse untrusted yaml documents may be impacted. The problem is patched in js-yaml 4.1.1 and 3.14.2. Users can protect against this kind of attack on the server by using `node --disable-proto=delete` or `deno` (in Deno, pollution protection is on by default).",
+      "severity": "MEDIUM",
+      "cvss": 5.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "js-yaml",
+      "fix": "Update to 4.1.1, 3.14.2",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2025-64718"
+      ]
+    },
+    {
+      "id": "CVE-2021-3918",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-json-schema: Prototype pollution vulnerability",
+      "description": "json-schema is vulnerable to Improperly Controlled Modification of Object Prototype Attributes ('Prototype Pollution')",
+      "severity": "CRITICAL",
+      "cvss": 9.8,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "json-schema",
+      "fix": "Update to 0.4.0",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2021-3918"
+      ]
+    },
+    {
+      "id": "CVE-2020-13110",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "DLL Injection in kerberos",
+      "description": "The kerberos package before 1.0.0 for Node.js allows arbitrary code execution and privilege escalation via injection of malicious DLLs through use of the kerberos_sspi LoadLibrary() method, because of a DLL path search.",
+      "severity": "HIGH",
+      "cvss": 7.8,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "kerberos",
+      "fix": "Update to 1.0.0",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2020-13110"
+      ]
+    },
+    {
+      "id": "CVE-2019-20149",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-kind-of: ctorName in index.js allows external user input to overwrite certain internal attributes",
+      "description": "ctorName in index.js in kind-of v6.0.2 allows external user input to overwrite certain internal attributes via a conflicting name, as demonstrated by 'constructor': {'name':'Symbol'}. Hence, a crafted payload can overwrite this builtin attribute to manipulate the type detection result.",
+      "severity": "HIGH",
+      "cvss": 7.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "kind-of",
+      "fix": "Update to 6.0.3",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2019-20149"
+      ]
+    },
+    {
+      "id": "CVE-2019-10744",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-lodash: prototype pollution in defaultsDeep function leading to modifying properties",
+      "description": "Versions of lodash lower than 4.17.12 are vulnerable to Prototype Pollution. The function defaultsDeep could be tricked into adding or modifying properties of Object.prototype using a constructor payload.",
+      "severity": "CRITICAL",
+      "cvss": 9.1,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "lodash",
+      "fix": "Update to 4.17.12",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2019-10744"
+      ]
+    },
+    {
+      "id": "CVE-2018-16487",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "lodash: Prototype pollution in utilities function",
+      "description": "A prototype pollution vulnerability was found in lodash <4.17.11 where the functions merge, mergeWith, and defaultsDeep can be tricked into adding or modifying properties of Object.prototype.",
+      "severity": "HIGH",
+      "cvss": 5.6,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "lodash",
+      "fix": "Update to >=4.17.11",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2018-16487"
+      ]
+    },
+    {
+      "id": "CVE-2020-8203",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-lodash: prototype pollution in zipObjectDeep function",
+      "description": "Prototype pollution attack when using _.zipObjectDeep in lodash before 4.17.20.",
+      "severity": "HIGH",
+      "cvss": 7.4,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "lodash",
+      "fix": "Update to 4.17.19",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2020-8203"
+      ]
+    },
+    {
+      "id": "CVE-2021-23337",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-lodash: command injection via template",
+      "description": "Lodash versions prior to 4.17.21 are vulnerable to Command Injection via the template function.",
+      "severity": "HIGH",
+      "cvss": 7.2,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "lodash",
+      "fix": "Update to 4.17.21",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2021-23337"
+      ]
+    },
+    {
+      "id": "CVE-2019-1010266",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "lodash: uncontrolled resource consumption in Data handler causing denial of service",
+      "description": "lodash prior to 4.17.11 is affected by: CWE-400: Uncontrolled Resource Consumption. The impact is: Denial of service. The component is: Date handler. The attack vector is: Attacker provides very long strings, which the library attempts to match using a regular expression. The fixed version is: 4.17.11.",
+      "severity": "MEDIUM",
+      "cvss": 6.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "lodash",
+      "fix": "Update to 4.17.11",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2019-1010266"
+      ]
+    },
+    {
+      "id": "CVE-2020-28500",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-lodash: ReDoS via the toNumber, trim and trimEnd functions",
+      "description": "Lodash versions prior to 4.17.21 are vulnerable to Regular Expression Denial of Service (ReDoS) via the toNumber, trim and trimEnd functions.",
+      "severity": "MEDIUM",
+      "cvss": 5.3,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "lodash",
+      "fix": "Update to 4.17.21",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2020-28500"
+      ]
+    },
+    {
+      "id": "CVE-2025-13465",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "lodash: prototype pollution in _.unset and _.omit functions",
+      "description": "Lodash versions 4.0.0 through 4.17.22 are vulnerable to prototype pollution in the _.unset\u00a0and _.omit\u00a0functions. An attacker can pass crafted paths which cause Lodash to delete methods from global prototypes.\n\nThe issue permits deletion of properties but does not allow overwriting their original behavior.\n\nThis issue is patched on 4.17.23",
+      "severity": "MEDIUM",
+      "cvss": 5.3,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "lodash",
+      "fix": "Update to 4.17.23",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2025-13465"
+      ]
+    },
+    {
+      "id": "CVE-2025-13465",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "lodash: prototype pollution in _.unset and _.omit functions",
+      "description": "Lodash versions 4.0.0 through 4.17.22 are vulnerable to prototype pollution in the _.unset\u00a0and _.omit\u00a0functions. An attacker can pass crafted paths which cause Lodash to delete methods from global prototypes.\n\nThe issue permits deletion of properties but does not allow overwriting their original behavior.\n\nThis issue is patched on 4.17.23",
+      "severity": "MEDIUM",
+      "cvss": 5.3,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "lodash",
+      "fix": "Update to 4.17.23",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2025-13465"
+      ]
+    },
+    {
+      "id": "CVE-2019-10744",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-lodash: prototype pollution in defaultsDeep function leading to modifying properties",
+      "description": "Versions of lodash lower than 4.17.12 are vulnerable to Prototype Pollution. The function defaultsDeep could be tricked into adding or modifying properties of Object.prototype using a constructor payload.",
+      "severity": "CRITICAL",
+      "cvss": 9.1,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "lodash",
+      "fix": "Update to 4.17.12",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2019-10744"
+      ]
+    },
+    {
+      "id": "CVE-2018-16487",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "lodash: Prototype pollution in utilities function",
+      "description": "A prototype pollution vulnerability was found in lodash <4.17.11 where the functions merge, mergeWith, and defaultsDeep can be tricked into adding or modifying properties of Object.prototype.",
+      "severity": "HIGH",
+      "cvss": 5.6,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "lodash",
+      "fix": "Update to >=4.17.11",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2018-16487"
+      ]
+    },
+    {
+      "id": "CVE-2020-8203",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-lodash: prototype pollution in zipObjectDeep function",
+      "description": "Prototype pollution attack when using _.zipObjectDeep in lodash before 4.17.20.",
+      "severity": "HIGH",
+      "cvss": 7.4,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "lodash",
+      "fix": "Update to 4.17.19",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2020-8203"
+      ]
+    },
+    {
+      "id": "CVE-2021-23337",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-lodash: command injection via template",
+      "description": "Lodash versions prior to 4.17.21 are vulnerable to Command Injection via the template function.",
+      "severity": "HIGH",
+      "cvss": 7.2,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "lodash",
+      "fix": "Update to 4.17.21",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2021-23337"
+      ]
+    },
+    {
+      "id": "CVE-2019-1010266",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "lodash: uncontrolled resource consumption in Data handler causing denial of service",
+      "description": "lodash prior to 4.17.11 is affected by: CWE-400: Uncontrolled Resource Consumption. The impact is: Denial of service. The component is: Date handler. The attack vector is: Attacker provides very long strings, which the library attempts to match using a regular expression. The fixed version is: 4.17.11.",
+      "severity": "MEDIUM",
+      "cvss": 6.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "lodash",
+      "fix": "Update to 4.17.11",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2019-1010266"
+      ]
+    },
+    {
+      "id": "CVE-2020-28500",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-lodash: ReDoS via the toNumber, trim and trimEnd functions",
+      "description": "Lodash versions prior to 4.17.21 are vulnerable to Regular Expression Denial of Service (ReDoS) via the toNumber, trim and trimEnd functions.",
+      "severity": "MEDIUM",
+      "cvss": 5.3,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "lodash",
+      "fix": "Update to 4.17.21",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2020-28500"
+      ]
+    },
+    {
+      "id": "CVE-2025-13465",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "lodash: prototype pollution in _.unset and _.omit functions",
+      "description": "Lodash versions 4.0.0 through 4.17.22 are vulnerable to prototype pollution in the _.unset\u00a0and _.omit\u00a0functions. An attacker can pass crafted paths which cause Lodash to delete methods from global prototypes.\n\nThe issue permits deletion of properties but does not allow overwriting their original behavior.\n\nThis issue is patched on 4.17.23",
+      "severity": "MEDIUM",
+      "cvss": 5.3,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "lodash",
+      "fix": "Update to 4.17.23",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2025-13465"
+      ]
+    },
+    {
+      "id": "CVE-2018-3721",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "lodash: Prototype pollution in utilities function",
+      "description": "lodash node module before 4.17.5 suffers from a Modification of Assumed-Immutable Data (MAID) vulnerability via defaultsDeep, merge, and mergeWith functions, which allows a malicious user to modify the prototype of \"Object\" via __proto__, causing the addition or modification of an existing property that will exist on all objects.",
+      "severity": "LOW",
+      "cvss": 6.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "lodash",
+      "fix": "Update to >=4.17.5",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2018-3721"
+      ]
+    },
+    {
+      "id": "CVE-2017-16114",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "The marked module is vulnerable to a regular expression denial of serv ...",
+      "description": "The marked module is vulnerable to a regular expression denial of service. Based on the information published in the public issue, 1k characters can block for around 6 seconds.",
+      "severity": "HIGH",
+      "cvss": 7.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "marked",
+      "fix": "Update to 0.3.9",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2017-16114"
+      ]
+    },
+    {
+      "id": "CVE-2022-21680",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "marked: regular expression block.def may lead Denial of Service",
+      "description": "Marked is a markdown parser and compiler. Prior to version 4.0.10, the regular expression `block.def` may cause catastrophic backtracking against some strings and lead to a regular expression denial of service (ReDoS). Anyone who runs untrusted markdown through a vulnerable version of marked and does not use a worker with a time limit may be affected. This issue is patched in version 4.0.10. As a workaround, avoid running untrusted markdown through marked or run marked on a worker thread and set a reasonable time limit to prevent draining resources.",
+      "severity": "HIGH",
+      "cvss": 7.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "marked",
+      "fix": "Update to 4.0.10",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2022-21680"
+      ]
+    },
+    {
+      "id": "CVE-2022-21681",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "marked: regular expression inline.reflinkSearch may lead Denial of Service",
+      "description": "Marked is a markdown parser and compiler. Prior to version 4.0.10, the regular expression `inline.reflinkSearch` may cause catastrophic backtracking against some strings and lead to a denial of service (DoS). Anyone who runs untrusted markdown through a vulnerable version of marked and does not use a worker with a time limit may be affected. This issue is patched in version 4.0.10. As a workaround, avoid running untrusted markdown through marked or run marked on a worker thread and set a reasonable time limit to prevent draining resources.",
+      "severity": "HIGH",
+      "cvss": 7.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "marked",
+      "fix": "Update to 4.0.10",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2022-21681"
+      ]
+    },
+    {
+      "id": "CVE-2016-10531",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "marked is an application that is meant to parse and compile markdown.  ...",
+      "description": "marked is an application that is meant to parse and compile markdown. Due to the way that marked 0.3.5 and earlier parses input, specifically HTML entities, it's possible to bypass marked's content injection protection (`sanitize: true`) to inject a `javascript:` URL. This flaw exists because `&#xNNanything;` gets parsed to what it could and leaves the rest behind, resulting in just `anything;` being left.",
+      "severity": "MEDIUM",
+      "cvss": 6.1,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "marked",
+      "fix": "Update to 0.3.6",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2016-10531"
+      ]
+    },
+    {
+      "id": "CVE-2017-1000427",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "marked version 0.3.6 and earlier is vulnerable to an XSS attack in the ...",
+      "description": "marked version 0.3.6 and earlier is vulnerable to an XSS attack in the data: URI parser.",
+      "severity": "MEDIUM",
+      "cvss": 6.1,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "marked",
+      "fix": "Update to 0.3.7",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2017-1000427"
+      ]
+    },
+    {
+      "id": "CVE-2018-25110",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "Marked prior to version 0.3.17 is vulnerable to a Regular Expression D ...",
+      "description": "Marked prior to version 0.3.17 is vulnerable to a Regular Expression Denial of Service (ReDoS) attack due to catastrophic backtracking in several regular expressions used for parsing HTML tags and markdown links. An attacker can exploit this vulnerability by providing specially crafted markdown input, such as deeply nested or repetitively structured brackets or tag attributes, which cause the parser to hang and lead to a Denial of Service.",
+      "severity": "MEDIUM",
+      "cvss": 7.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "marked",
+      "fix": "Update to 0.3.17",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2018-25110"
+      ]
+    },
+    {
+      "id": "NSWG-ECO-101",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "Sanitization bypass using HTML Entities",
+      "description": "marked is an application that is meant to parse and compile markdown.\n\nDue to the way that marked parses input, specifically HTML entities, it's possible to bypass marked's content injection protection (`sanitize: true`) to inject a `javascript:` URL.\n\nThis flaw exists because `&#xNNanything;` gets parsed to what it could and leaves the rest behind, resulting in just `anything;` being left. \n\nFor example:\n\nIf a malicious user could provide this input to the application `javascript&#x58document;alert&#40;1&#41;` resulting in a valid link, that when a user clicked it would execute `alert(1)`.",
+      "severity": "MEDIUM",
+      "cvss": 5.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "marked",
+      "fix": "Update to >=0.3.6",
+      "references": []
+    },
+    {
+      "id": "GHSA-4xcv-9jjx-gfj3",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "Denial of Service in mem",
+      "description": "Versions of `mem` prior to 4.0.0 are vulnerable to Denial of Service (DoS).  The package fails to remove old values from the cache even after a value passes its `maxAge` property. This may allow attackers to exhaust the system's memory if they are able to abuse the application logging.\n\n\n## Recommendation\n\nUpgrade to version 4.0.0 or later.",
+      "severity": "MEDIUM",
+      "cvss": 5.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "mem",
+      "fix": "Update to 4.0.0",
+      "references": [
+        "https://github.com/advisories/GHSA-4xcv-9jjx-gfj3"
+      ]
+    },
+    {
+      "id": "CVE-2024-4067",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "micromatch: vulnerable to Regular Expression Denial of Service",
+      "description": "The NPM package `micromatch` prior to 4.0.8 is vulnerable to Regular Expression Denial of Service (ReDoS). The vulnerability occurs in `micromatch.braces()` in `index.js` because the pattern `.*` will greedily match anything. By passing a malicious payload, the pattern matching will keep backtracking to the input while it doesn't find the closing bracket. As the input size increases, the consumption time will also increase until it causes the application to hang or slow down. There was a merged fix but further testing shows the issue persists. This issue should be mitigated by using a safe pattern that won't start backtracking the regular expression due to greedy matching. This issue was fixed in version 4.0.8.",
+      "severity": "MEDIUM",
+      "cvss": 5.3,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "micromatch",
+      "fix": "Update to 4.0.8",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2024-4067"
+      ]
+    },
+    {
+      "id": "CVE-2017-16138",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-mime: Regular expression Denial of Service",
+      "description": "The mime module < 1.4.1, 2.0.1, 2.0.2 is vulnerable to regular expression denial of service when a mime lookup is performed on untrusted user input.",
+      "severity": "HIGH",
+      "cvss": 7.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "mime",
+      "fix": "Update to 2.0.3, 1.4.1",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2017-16138"
+      ]
+    },
+    {
+      "id": "CVE-2017-16138",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-mime: Regular expression Denial of Service",
+      "description": "The mime module < 1.4.1, 2.0.1, 2.0.2 is vulnerable to regular expression denial of service when a mime lookup is performed on untrusted user input.",
+      "severity": "HIGH",
+      "cvss": 7.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "mime",
+      "fix": "Update to 2.0.3, 1.4.1",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2017-16138"
+      ]
+    },
+    {
+      "id": "CVE-2022-3517",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-minimatch: ReDoS via the braceExpand function",
+      "description": "A vulnerability was found in the minimatch package. This flaw allows a Regular Expression Denial of Service (ReDoS) when calling the braceExpand function with specific arguments, resulting in a Denial of Service.",
+      "severity": "HIGH",
+      "cvss": 7.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "minimatch",
+      "fix": "Update to 3.0.5",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2022-3517"
+      ]
+    },
+    {
+      "id": "CVE-2026-26996",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "minimatch: minimatch: Denial of Service via specially crafted glob patterns",
+      "description": "minimatch is a minimal matching utility for converting glob expressions into JavaScript RegExp objects. Versions 10.2.0 and below are vulnerable to Regular Expression Denial of Service (ReDoS) when a glob pattern contains many consecutive * wildcards followed by a literal character that doesn't appear in the test string. Each * compiles to a separate [^/]*? regex group, and when the match fails, V8's regex engine backtracks exponentially across all possible splits. The time complexity is O(4^N) where N is the number of * characters. With N=15, a single minimatch() call takes ~2 seconds. With N=34, it hangs effectively forever. Any application that passes user-controlled strings to minimatch() as the pattern argument is vulnerable to DoS. This issue has been fixed in version 10.2.1.",
+      "severity": "HIGH",
+      "cvss": 7.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "minimatch",
+      "fix": "Update to 10.2.1, 9.0.6, 8.0.5, 7.4.7, 6.2.1, 5.1.7, 4.2.4, 3.1.3",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2026-26996"
+      ]
+    },
+    {
+      "id": "CVE-2026-27903",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "minimatch: minimatch: Denial of Service due to unbounded recursive backtracking via crafted glob patterns",
+      "description": "minimatch is a minimal matching utility for converting glob expressions into JavaScript RegExp objects. Prior to version 10.2.3, 9.0.7, 8.0.6, 7.4.8, 6.2.2, 5.1.8, 4.2.5, and 3.1.3, `matchOne()` performs unbounded recursive backtracking when a glob pattern contains multiple non-adjacent `**` (GLOBSTAR) segments and the input path does not match. The time complexity is O(C(n, k)) -- binomial -- where `n` is the number of path segments and `k` is the number of globstars. With k=11 and n=30, a call to the default `minimatch()` API stalls for roughly 5 seconds. With k=13, it exceeds 15 seconds. No memoization or call budget exists to bound this behavior. Any application where an attacker can influence the glob pattern passed to `minimatch()` is vulnerable. The realistic attack surface includes build tools and task runners that accept user-supplied glob arguments (ESLint, Webpack, Rollup config), multi-tenant systems where one tenant configures glob-based rules that run in a shared process, admin or developer interfaces that accept ignore-rule or filter configuration as globs, and CI/CD pipelines that evaluate user-submitted config files containing glob patterns. An attacker who can place a crafted pattern into any of these paths can stall the Node.js event loop for tens of seconds per invocation. The pattern is 56 bytes for a 5-second stall and does not require authentication in contexts where pattern input is part of the feature. Versions 10.2.3, 9.0.7, 8.0.6, 7.4.8, 6.2.2, 5.1.8, 4.2.5, and 3.1.3 fix the issue.",
+      "severity": "HIGH",
+      "cvss": 8.0,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "minimatch",
+      "fix": "Update to 10.2.3, 9.0.7, 8.0.6, 7.4.8, 6.2.2, 5.1.8, 4.2.5, 3.1.3",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2026-27903"
+      ]
+    },
+    {
+      "id": "CVE-2026-27904",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "minimatch: Minimatch: Denial of Service via catastrophic backtracking in glob expressions",
+      "description": "minimatch is a minimal matching utility for converting glob expressions into JavaScript RegExp objects. Prior to version 10.2.3, 9.0.7, 8.0.6, 7.4.8, 6.2.2, 5.1.8, 4.2.5, and 3.1.4, nested `*()` extglobs produce regexps with nested unbounded quantifiers (e.g. `(?:(?:a|b)*)*`), which exhibit catastrophic backtracking in V8. With a 12-byte pattern `*(*(*(a|b)))` and an 18-byte non-matching input, `minimatch()` stalls for over 7 seconds. Adding a single nesting level or a few input characters pushes this to minutes. This is the most severe finding: it is triggered by the default `minimatch()` API with no special options, and the minimum viable pattern is only 12 bytes. The same issue affects `+()` extglobs equally. Versions 10.2.3, 9.0.7, 8.0.6, 7.4.8, 6.2.2, 5.1.8, 4.2.5, and 3.1.4 fix the issue.",
+      "severity": "HIGH",
+      "cvss": 8.0,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "minimatch",
+      "fix": "Update to 10.2.3, 9.0.7, 8.0.6, 7.4.8, 6.2.2, 5.1.8, 4.2.5, 3.1.4",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2026-27904"
+      ]
+    },
+    {
+      "id": "CVE-2021-44906",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "minimist: prototype pollution",
+      "description": "Minimist <=1.2.5 is vulnerable to Prototype Pollution via file index.js, function setKey() (lines 69-95).",
+      "severity": "CRITICAL",
+      "cvss": 9.8,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "minimist",
+      "fix": "Update to 1.2.6, 0.2.4",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2021-44906"
+      ]
+    },
+    {
+      "id": "CVE-2020-7598",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-minimist: prototype pollution allows adding or modifying properties of Object.prototype using a constructor or __proto__ payload",
+      "description": "minimist before 1.2.2 could be tricked into adding or modifying properties of Object.prototype using a \"constructor\" or \"__proto__\" payload.",
+      "severity": "MEDIUM",
+      "cvss": 5.6,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "minimist",
+      "fix": "Update to 0.2.1, 1.2.3",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2020-7598"
+      ]
+    },
+    {
+      "id": "CVE-2021-44906",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "minimist: prototype pollution",
+      "description": "Minimist <=1.2.5 is vulnerable to Prototype Pollution via file index.js, function setKey() (lines 69-95).",
+      "severity": "CRITICAL",
+      "cvss": 9.8,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "minimist",
+      "fix": "Update to 1.2.6, 0.2.4",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2021-44906"
+      ]
+    },
+    {
+      "id": "CVE-2020-7598",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-minimist: prototype pollution allows adding or modifying properties of Object.prototype using a constructor or __proto__ payload",
+      "description": "minimist before 1.2.2 could be tricked into adding or modifying properties of Object.prototype using a \"constructor\" or \"__proto__\" payload.",
+      "severity": "MEDIUM",
+      "cvss": 5.6,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "minimist",
+      "fix": "Update to 0.2.1, 1.2.3",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2020-7598"
+      ]
+    },
+    {
+      "id": "CVE-2021-44906",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "minimist: prototype pollution",
+      "description": "Minimist <=1.2.5 is vulnerable to Prototype Pollution via file index.js, function setKey() (lines 69-95).",
+      "severity": "CRITICAL",
+      "cvss": 9.8,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "minimist",
+      "fix": "Update to 1.2.6, 0.2.4",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2021-44906"
+      ]
+    },
+    {
+      "id": "CVE-2020-7598",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-minimist: prototype pollution allows adding or modifying properties of Object.prototype using a constructor or __proto__ payload",
+      "description": "minimist before 1.2.2 could be tricked into adding or modifying properties of Object.prototype using a \"constructor\" or \"__proto__\" payload.",
+      "severity": "MEDIUM",
+      "cvss": 5.6,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "minimist",
+      "fix": "Update to 0.2.1, 1.2.3",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2020-7598"
+      ]
+    },
+    {
+      "id": "CVE-2021-44906",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "minimist: prototype pollution",
+      "description": "Minimist <=1.2.5 is vulnerable to Prototype Pollution via file index.js, function setKey() (lines 69-95).",
+      "severity": "CRITICAL",
+      "cvss": 9.8,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "minimist",
+      "fix": "Update to 1.2.6, 0.2.4",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2021-44906"
+      ]
+    },
+    {
+      "id": "CVE-2019-10746",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-mixin-deep: prototype pollution in function mixin-deep",
+      "description": "mixin-deep is vulnerable to Prototype Pollution in versions before 1.3.2 and version 2.0.0. The function mixin-deep could be tricked into adding or modifying properties of Object.prototype using a constructor payload.",
+      "severity": "CRITICAL",
+      "cvss": 9.8,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "mixin-deep",
+      "fix": "Update to 1.3.2, 2.0.1",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2019-10746"
+      ]
+    },
+    {
+      "id": "CVE-2017-18214",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-moment: Regular expression denial of service",
+      "description": "The moment module before 2.19.3 for Node.js is prone to a regular expression denial of service via a crafted date string, a different vulnerability than CVE-2016-4055.",
+      "severity": "HIGH",
+      "cvss": 7.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "moment",
+      "fix": "Update to 2.19.3",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2017-18214"
+      ]
+    },
+    {
+      "id": "CVE-2022-24785",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "Moment.js: Path traversal  in moment.locale",
+      "description": "Moment.js is a JavaScript date library for parsing, validating, manipulating, and formatting dates. A path traversal vulnerability impacts npm (server) users of Moment.js between versions 1.0.1 and 2.29.1, especially if a user-provided locale string is directly used to switch moment locale. This problem is patched in 2.29.2, and the patch can be applied to all affected versions. As a workaround, sanitize the user-provided locale name before passing it to Moment.js.",
+      "severity": "HIGH",
+      "cvss": 7.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "moment",
+      "fix": "Update to 2.29.2",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2022-24785"
+      ]
+    },
+    {
+      "id": "GHSA-mh5c-679w-hh4r",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "Denial of Service in mongodb",
+      "description": "Versions of `mongodb` prior to 3.1.13 are vulnerable to Denial of Service. The package fails to properly catch an exception when a collection name is invalid and the DB does not exist, crashing the application.\n\n\n## Recommendation\n\nUpgrade to version 3.1.13 or later.",
+      "severity": "HIGH",
+      "cvss": 8.0,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "mongodb",
+      "fix": "Update to 3.1.13",
+      "references": [
+        "https://github.com/advisories/GHSA-mh5c-679w-hh4r"
+      ]
+    },
+    {
+      "id": "CVE-2019-17426",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "Improper Input Validation in Automattic Mongoose",
+      "description": "Automattic Mongoose through 5.7.4 allows attackers to bypass access control (in some applications) because any query object with a _bsontype attribute is ignored. For example, adding \"_bsontype\":\"a\" can sometimes interfere with a query filter. NOTE: this CVE is about Mongoose's failure to work around this _bsontype special case that exists in older versions of the bson parser (aka the mongodb/js-bson project).",
+      "severity": "CRITICAL",
+      "cvss": 9.1,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "mongoose",
+      "fix": "Update to 5.7.5, 4.13.21",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2019-17426"
+      ]
+    },
+    {
+      "id": "CVE-2023-3696",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "Mongoose Prototype Pollution vulnerability",
+      "description": "Prototype Pollution in GitHub repository automattic/mongoose prior to 7.3.4.",
+      "severity": "CRITICAL",
+      "cvss": 9.8,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "mongoose",
+      "fix": "Update to 7.3.3, 6.11.3, 5.13.20",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2023-3696"
+      ]
+    },
+    {
+      "id": "CVE-2025-23061",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "Mongoose search injection vulnerability",
+      "description": "Mongoose before 8.9.5 can improperly use a nested $where filter with a populate() match, leading to search injection. NOTE: this issue exists because of an incomplete fix for CVE-2024-53900.",
+      "severity": "CRITICAL",
+      "cvss": 9.8,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "mongoose",
+      "fix": "Update to 8.9.5, 7.8.4, 6.13.6",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2025-23061"
+      ]
+    },
+    {
+      "id": "CVE-2022-2564",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "automattic/mongoose vulnerable to Prototype pollution via Schema.path",
+      "description": "Prototype Pollution in GitHub repository automattic/mongoose prior to 6.4.6.",
+      "severity": "HIGH",
+      "cvss": 9.8,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "mongoose",
+      "fix": "Update to 6.4.6, 5.13.15",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2022-2564"
+      ]
+    },
+    {
+      "id": "CVE-2024-53900",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "Mongoose search injection vulnerability",
+      "description": "Mongoose before 8.8.3 can improperly use $where in match, leading to search injection.",
+      "severity": "HIGH",
+      "cvss": 8.0,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "mongoose",
+      "fix": "Update to 8.8.3, 7.8.3, 6.13.5, 5.13.23",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2024-53900"
+      ]
+    },
+    {
+      "id": "GHSA-r5xw-q988-826m",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "Remote Memory Exposure in mongoose",
+      "description": "Versions of `mongoose` before 4.3.6, 3.8.39 are vulnerable to remote memory exposure.\n\nTrying to save a number to a field of type Buffer on the affected mongoose versions allocates a chunk of uninitialized memory and stores it in the database.\n\n\n## Recommendation\n\nUpdate to version 4.3.6, 3.8.39 or later.",
+      "severity": "MEDIUM",
+      "cvss": 5.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "mongoose",
+      "fix": "Update to 3.8.39, 4.3.6",
+      "references": [
+        "https://github.com/advisories/GHSA-r5xw-q988-826m"
+      ]
+    },
+    {
+      "id": "NSWG-ECO-394",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "Remote Memory Exposure",
+      "description": "Trying to save a number to a field of type Buffer on the affected mongoose versions allocates a chunk of uninitialized memory and stores it in the database.",
+      "severity": "MEDIUM",
+      "cvss": 5.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "mongoose",
+      "fix": "Update to >=4.3.6, >=3.8.39 <4.0.0",
+      "references": []
+    },
+    {
+      "id": "CVE-2018-16490",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-mpath: prototype pollution in Object.prototype",
+      "description": "A prototype pollution vulnerability was found in module mpath <0.5.1 that allows an attacker to inject arbitrary properties onto Object.prototype.",
+      "severity": "HIGH",
+      "cvss": 7.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "mpath",
+      "fix": "Update to >=0.5.1",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2018-16490"
+      ]
+    },
+    {
+      "id": "CVE-2021-23438",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "mpath: type confusion can lead to a bypass of CVE-2018-16490",
+      "description": "This affects the package mpath before 0.8.4. A type confusion vulnerability can lead to a bypass of CVE-2018-16490. In particular, the condition ignoreProperties.indexOf(parts[i]) !== -1 returns -1 if parts[i] is ['__proto__']. This is because the method that has been called if the input is an array is Array.prototype.indexOf() and not String.prototype.indexOf(). They behave differently depending on the type of the input.",
+      "severity": "MEDIUM",
+      "cvss": 9.8,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "mpath",
+      "fix": "Update to 0.8.4",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2021-23438"
+      ]
+    },
+    {
+      "id": "CVE-2020-35149",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "mquery: Code injection via merge or clone operation",
+      "description": "lib/utils.js in mquery before 3.2.3 allows a pollution attack because a special property (e.g., __proto__) can be copied during a merge or clone operation.",
+      "severity": "MEDIUM",
+      "cvss": 5.3,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "mquery",
+      "fix": "Update to 3.2.3",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2020-35149"
+      ]
+    },
+    {
+      "id": "CVE-2015-8315",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-ms: regular expression denial of service",
+      "description": "The ms package before 0.7.1 for Node.js allows attackers to cause a denial of service (CPU consumption) via a long version string, aka a \"regular expression denial of service (ReDoS).\"",
+      "severity": "MEDIUM",
+      "cvss": 7.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "ms",
+      "fix": "Update to >0.7.0",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2015-8315"
+      ]
+    },
+    {
+      "id": "CVE-2017-20162",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "Vercel ms Inefficient Regular Expression Complexity vulnerability",
+      "description": "A vulnerability, which was classified as problematic, has been found in vercel ms up to 1.x. This issue affects the function parse of the file index.js. The manipulation of the argument str leads to inefficient regular expression complexity. The attack may be initiated remotely. The exploit has been disclosed to the public and may be used. Upgrading to version 2.0.0 is able to address this issue. The patch is named caae2988ba2a37765d055c4eee63d383320ee662. It is recommended to upgrade the affected component. The associated identifier of this vulnerability is VDB-217451.",
+      "severity": "MEDIUM",
+      "cvss": 5.3,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "ms",
+      "fix": "Update to 2.0.0",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2017-20162"
+      ]
+    },
+    {
+      "id": "CVE-2017-20162",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "Vercel ms Inefficient Regular Expression Complexity vulnerability",
+      "description": "A vulnerability, which was classified as problematic, has been found in vercel ms up to 1.x. This issue affects the function parse of the file index.js. The manipulation of the argument str leads to inefficient regular expression complexity. The attack may be initiated remotely. The exploit has been disclosed to the public and may be used. Upgrading to version 2.0.0 is able to address this issue. The patch is named caae2988ba2a37765d055c4eee63d383320ee662. It is recommended to upgrade the affected component. The associated identifier of this vulnerability is VDB-217451.",
+      "severity": "MEDIUM",
+      "cvss": 5.3,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "ms",
+      "fix": "Update to 2.0.0",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2017-20162"
+      ]
+    },
+    {
+      "id": "CVE-2017-20162",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "Vercel ms Inefficient Regular Expression Complexity vulnerability",
+      "description": "A vulnerability, which was classified as problematic, has been found in vercel ms up to 1.x. This issue affects the function parse of the file index.js. The manipulation of the argument str leads to inefficient regular expression complexity. The attack may be initiated remotely. The exploit has been disclosed to the public and may be used. Upgrading to version 2.0.0 is able to address this issue. The patch is named caae2988ba2a37765d055c4eee63d383320ee662. It is recommended to upgrade the affected component. The associated identifier of this vulnerability is VDB-217451.",
+      "severity": "MEDIUM",
+      "cvss": 5.3,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "ms",
+      "fix": "Update to 2.0.0",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2017-20162"
+      ]
+    },
+    {
+      "id": "CVE-2016-10539",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "negotiator is an HTTP content negotiator for Node.js and is used by ma ...",
+      "description": "negotiator is an HTTP content negotiator for Node.js and is used by many modules and frameworks including Express and Koa. The header for \"Accept-Language\", when parsed by negotiator 0.6.0 and earlier is vulnerable to Regular Expression Denial of Service via a specially crafted string.",
+      "severity": "HIGH",
+      "cvss": 7.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "negotiator",
+      "fix": "Update to 0.6.1",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2016-10539"
+      ]
+    },
+    {
+      "id": "NSWG-ECO-106",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "Regular Expression Denial of Service",
+      "description": "negotiator is an HTTP content negotiator for Node.js and is used by many modules and frameworks including Express and Koa.\n\nThe header for \"Accept-Language\", when parsed by negotiator is vulnerable to Regular Expression Denial of Service via a specially crafted string. \n\nTimeline\n\n- April 29th 2016 - Initial report to maintainers\n- April 29th 2016 - Confirm receipt from maintainers\n- May 1st 2016 - Fix confirmed\n- May 5th 2016 - 0.6.1 published with fix\n- June 16th 2016 - Advisory published (delay was to coordinate fixes in upstream frameworks, Koa and Express)",
+      "severity": "HIGH",
+      "cvss": 8.0,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "negotiator",
+      "fix": "Update to >= 0.6.1",
+      "references": []
+    },
+    {
+      "id": "CVE-2016-10539",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "negotiator is an HTTP content negotiator for Node.js and is used by ma ...",
+      "description": "negotiator is an HTTP content negotiator for Node.js and is used by many modules and frameworks including Express and Koa. The header for \"Accept-Language\", when parsed by negotiator 0.6.0 and earlier is vulnerable to Regular Expression Denial of Service via a specially crafted string.",
+      "severity": "HIGH",
+      "cvss": 7.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "negotiator",
+      "fix": "Update to 0.6.1",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2016-10539"
+      ]
+    },
+    {
+      "id": "NSWG-ECO-106",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "Regular Expression Denial of Service",
+      "description": "negotiator is an HTTP content negotiator for Node.js and is used by many modules and frameworks including Express and Koa.\n\nThe header for \"Accept-Language\", when parsed by negotiator is vulnerable to Regular Expression Denial of Service via a specially crafted string. \n\nTimeline\n\n- April 29th 2016 - Initial report to maintainers\n- April 29th 2016 - Confirm receipt from maintainers\n- May 1st 2016 - Fix confirmed\n- May 5th 2016 - 0.6.1 published with fix\n- June 16th 2016 - Advisory published (delay was to coordinate fixes in upstream frameworks, Koa and Express)",
+      "severity": "HIGH",
+      "cvss": 8.0,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "negotiator",
+      "fix": "Update to >= 0.6.1",
+      "references": []
+    },
+    {
+      "id": "CVE-2016-10539",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "negotiator is an HTTP content negotiator for Node.js and is used by ma ...",
+      "description": "negotiator is an HTTP content negotiator for Node.js and is used by many modules and frameworks including Express and Koa. The header for \"Accept-Language\", when parsed by negotiator 0.6.0 and earlier is vulnerable to Regular Expression Denial of Service via a specially crafted string.",
+      "severity": "HIGH",
+      "cvss": 7.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "negotiator",
+      "fix": "Update to 0.6.1",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2016-10539"
+      ]
+    },
+    {
+      "id": "NSWG-ECO-106",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "Regular Expression Denial of Service",
+      "description": "negotiator is an HTTP content negotiator for Node.js and is used by many modules and frameworks including Express and Koa.\n\nThe header for \"Accept-Language\", when parsed by negotiator is vulnerable to Regular Expression Denial of Service via a specially crafted string. \n\nTimeline\n\n- April 29th 2016 - Initial report to maintainers\n- April 29th 2016 - Confirm receipt from maintainers\n- May 1st 2016 - Fix confirmed\n- May 5th 2016 - 0.6.1 published with fix\n- June 16th 2016 - Advisory published (delay was to coordinate fixes in upstream frameworks, Koa and Express)",
+      "severity": "HIGH",
+      "cvss": 8.0,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "negotiator",
+      "fix": "Update to >= 0.6.1",
+      "references": []
+    },
+    {
+      "id": "NSWG-ECO-431",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "Out-of-bounds Read",
+      "description": "`npmconf` (and `npm` js api) allocate and write to disk uninitialized memory content when a typed number is passed as input on Node.js 4.x",
+      "severity": "HIGH",
+      "cvss": 8.0,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "npmconf",
+      "fix": "Update to >=2.1.3",
+      "references": [
+        "https://hackerone.com/reports/320269"
+      ]
+    },
+    {
+      "id": "GHSA-57cf-349j-352g",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "Out-of-bounds Read in npmconf",
+      "description": "Versions of `npmconf` before 2.1.3 allocate and write to disk uninitialized memory contents when a typed number is passed as input on Node.js 4.x.\n\n\n## Recommendation\n\nUpdate to version 2.1.3 or later. Consider switching to another config storage mechanism, as npmconf is deprecated and should not be used.",
+      "severity": "MEDIUM",
+      "cvss": 5.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "npmconf",
+      "fix": "Update to 2.1.3",
+      "references": [
+        "https://github.com/advisories/GHSA-57cf-349j-352g"
+      ]
+    },
+    {
+      "id": "CVE-2025-7339",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "on-headers: on-headers vulnerable to http response header manipulation",
+      "description": "on-headers is a node.js middleware for listening to when a response writes headers. A bug in on-headers versions `<1.1.0` may result in response headers being inadvertently modified when an array is passed to `response.writeHead()`.\u00a0Users should upgrade to version 1.1.0 to receive a patch.\u00a0Uses are strongly encouraged to upgrade to `1.1.0`, but this issue can be worked around by passing an object to `response.writeHead()` rather than an array.",
+      "severity": "LOW",
+      "cvss": 2.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "on-headers",
+      "fix": "Update to 1.1.0",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2025-7339"
+      ]
+    },
+    {
+      "id": "CVE-2021-23343",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-path-parse: ReDoS via splitDeviceRe, splitTailRe and splitPathRe",
+      "description": "All versions of package path-parse are vulnerable to Regular Expression Denial of Service (ReDoS) via splitDeviceRe, splitTailRe, and splitPathRe regular expressions. ReDoS exhibits polynomial worst-case time complexity.",
+      "severity": "MEDIUM",
+      "cvss": 7.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "path-parse",
+      "fix": "Update to 1.0.7",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2021-23343"
+      ]
+    },
+    {
+      "id": "CVE-2024-45296",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "path-to-regexp: Backtracking regular expressions cause ReDoS",
+      "description": "path-to-regexp turns path strings into a regular expressions. In certain cases, path-to-regexp will output a regular expression that can be exploited to cause poor performance. Because JavaScript is single threaded and regex matching runs on the main thread, poor performance will block the event loop and lead to a DoS. The bad regular expression is generated any time you have two parameters within a single segment, separated by something that is not a period (.). For users of 0.1, upgrade to 0.1.10. All other users should upgrade to 8.0.0.",
+      "severity": "HIGH",
+      "cvss": 8.0,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "path-to-regexp",
+      "fix": "Update to 1.9.0, 0.1.10, 8.0.0, 3.3.0, 6.3.0",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2024-45296"
+      ]
+    },
+    {
+      "id": "CVE-2024-52798",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "path-to-regexp: path-to-regexp Unpatched `path-to-regexp` ReDoS in 0.1.x",
+      "description": "path-to-regexp turns path strings into a regular expressions. In certain cases, path-to-regexp will output a regular expression that can be exploited to cause poor performance. The regular expression that is vulnerable to backtracking can be generated in the 0.1.x release of path-to-regexp. Upgrade to 0.1.12. This vulnerability exists because of an incomplete fix for CVE-2024-45296.",
+      "severity": "HIGH",
+      "cvss": 8.0,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "path-to-regexp",
+      "fix": "Update to 0.1.12",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2024-52798"
+      ]
+    },
+    {
+      "id": "CVE-2017-1000048",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-qs: Prototype override protection bypass",
+      "description": "the web framework using ljharb's qs module older than v6.3.2, v6.2.3, v6.1.2, and v6.0.4 is vulnerable to a DoS. A malicious user can send a evil request to cause the web framework crash.",
+      "severity": "HIGH",
+      "cvss": 7.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "qs",
+      "fix": "Update to 6.0.4, 6.1.2, 6.2.3, 6.3.2",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2017-1000048"
+      ]
+    },
+    {
+      "id": "CVE-2022-24999",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "express: \"qs\" prototype poisoning causes the hang of the node process",
+      "description": "qs before 6.10.3, as used in Express before 4.17.3 and other products, allows attackers to cause a Node process hang for an Express application because an __ proto__ key can be used. In many typical Express use cases, an unauthenticated remote attacker can place the attack payload in the query string of the URL that is used to visit the application, such as a[__proto__]=b&a[__proto__]&a[length]=100000000. The fix was backported to qs 6.9.7, 6.8.3, 6.7.3, 6.6.1, 6.5.3, 6.4.1, 6.3.3, and 6.2.4 (and therefore Express 4.17.3, which has \"deps: qs@6.9.7\" in its release description, is not vulnerable).",
+      "severity": "HIGH",
+      "cvss": 7.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "qs",
+      "fix": "Update to 6.10.3, 6.9.7, 6.8.3, 6.7.3, 6.6.1, 6.5.3, 6.4.1, 6.3.3, 6.2.4",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2022-24999"
+      ]
+    },
+    {
+      "id": "CVE-2025-15284",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "qs: qs: Denial of Service via improper input validation in array parsing",
+      "description": "Improper Input Validation vulnerability in qs (parse modules) allows HTTP DoS.This issue affects qs: < 6.14.1.\n\n\nSummary\n\nThe arrayLimit\u00a0option in qs did not enforce limits for bracket notation (a[]=1&a[]=2), only for indexed notation (a[0]=1). This is a consistency bug; arrayLimit\u00a0should apply uniformly across all array notations.\n\nNote:\u00a0The default parameterLimit\u00a0of 1000 effectively mitigates the DoS scenario originally described. With default options, bracket notation cannot produce arrays larger than parameterLimit\u00a0regardless of arrayLimit, because each a[]=valueconsumes one parameter slot. The severity has been reduced accordingly.\n\nDetails\n\nThe arrayLimit\u00a0option only checked limits for indexed notation (a[0]=1&a[1]=2) but did not enforce it for bracket notation (a[]=1&a[]=2).\n\nVulnerable code\u00a0(lib/parse.js:159-162):\n\nif (root === '[]' && options.parseArrays) {\n    obj = utils.combine([], leaf);  // No arrayLimit check\n}\n\n\n\n\n\nWorking code\u00a0(lib/parse.js:175):\n\nelse if (index <= options.arrayLimit) {  // Limit checked here\n    obj = [];\n    obj[index] = leaf;\n}\n\n\n\n\n\nThe bracket notation handler at line 159 uses utils.combine([], leaf)\u00a0without validating against options.arrayLimit, while indexed notation at line 175 checks index <= options.arrayLimit\u00a0before creating arrays.\n\n\n\nPoC\n\nconst qs = require('qs');\nconst result = qs.parse('a[]=1&a[]=2&a[]=3&a[]=4&a[]=5&a[]=6', { arrayLimit: 5 });\nconsole.log(result.a.length);  // Output: 6 (should be max 5)\n\n\n\n\n\nNote on parameterLimit interaction:\u00a0The original advisory's \"DoS demonstration\" claimed a length of 10,000, but parameterLimit\u00a0(default: 1000) caps parsing to 1,000 parameters. With default options, the actual output is 1,000, not 10,000.\n\nImpact\n\nConsistency bug in arrayLimit\u00a0enforcement. With default parameterLimit, the practical DoS risk is negligible since parameterLimit\u00a0already caps the total number of parsed parameters (and thus array elements from bracket notation). The risk increases only when parameterLimit\u00a0is explicitly set to a very high value.",
+      "severity": "MEDIUM",
+      "cvss": 5.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "qs",
+      "fix": "Update to 6.14.1",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2025-15284"
+      ]
+    },
+    {
+      "id": "CVE-2017-1000048",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-qs: Prototype override protection bypass",
+      "description": "the web framework using ljharb's qs module older than v6.3.2, v6.2.3, v6.1.2, and v6.0.4 is vulnerable to a DoS. A malicious user can send a evil request to cause the web framework crash.",
+      "severity": "HIGH",
+      "cvss": 7.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "qs",
+      "fix": "Update to 6.0.4, 6.1.2, 6.2.3, 6.3.2",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2017-1000048"
+      ]
+    },
+    {
+      "id": "CVE-2022-24999",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "express: \"qs\" prototype poisoning causes the hang of the node process",
+      "description": "qs before 6.10.3, as used in Express before 4.17.3 and other products, allows attackers to cause a Node process hang for an Express application because an __ proto__ key can be used. In many typical Express use cases, an unauthenticated remote attacker can place the attack payload in the query string of the URL that is used to visit the application, such as a[__proto__]=b&a[__proto__]&a[length]=100000000. The fix was backported to qs 6.9.7, 6.8.3, 6.7.3, 6.6.1, 6.5.3, 6.4.1, 6.3.3, and 6.2.4 (and therefore Express 4.17.3, which has \"deps: qs@6.9.7\" in its release description, is not vulnerable).",
+      "severity": "HIGH",
+      "cvss": 7.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "qs",
+      "fix": "Update to 6.10.3, 6.9.7, 6.8.3, 6.7.3, 6.6.1, 6.5.3, 6.4.1, 6.3.3, 6.2.4",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2022-24999"
+      ]
+    },
+    {
+      "id": "CVE-2025-15284",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "qs: qs: Denial of Service via improper input validation in array parsing",
+      "description": "Improper Input Validation vulnerability in qs (parse modules) allows HTTP DoS.This issue affects qs: < 6.14.1.\n\n\nSummary\n\nThe arrayLimit\u00a0option in qs did not enforce limits for bracket notation (a[]=1&a[]=2), only for indexed notation (a[0]=1). This is a consistency bug; arrayLimit\u00a0should apply uniformly across all array notations.\n\nNote:\u00a0The default parameterLimit\u00a0of 1000 effectively mitigates the DoS scenario originally described. With default options, bracket notation cannot produce arrays larger than parameterLimit\u00a0regardless of arrayLimit, because each a[]=valueconsumes one parameter slot. The severity has been reduced accordingly.\n\nDetails\n\nThe arrayLimit\u00a0option only checked limits for indexed notation (a[0]=1&a[1]=2) but did not enforce it for bracket notation (a[]=1&a[]=2).\n\nVulnerable code\u00a0(lib/parse.js:159-162):\n\nif (root === '[]' && options.parseArrays) {\n    obj = utils.combine([], leaf);  // No arrayLimit check\n}\n\n\n\n\n\nWorking code\u00a0(lib/parse.js:175):\n\nelse if (index <= options.arrayLimit) {  // Limit checked here\n    obj = [];\n    obj[index] = leaf;\n}\n\n\n\n\n\nThe bracket notation handler at line 159 uses utils.combine([], leaf)\u00a0without validating against options.arrayLimit, while indexed notation at line 175 checks index <= options.arrayLimit\u00a0before creating arrays.\n\n\n\nPoC\n\nconst qs = require('qs');\nconst result = qs.parse('a[]=1&a[]=2&a[]=3&a[]=4&a[]=5&a[]=6', { arrayLimit: 5 });\nconsole.log(result.a.length);  // Output: 6 (should be max 5)\n\n\n\n\n\nNote on parameterLimit interaction:\u00a0The original advisory's \"DoS demonstration\" claimed a length of 10,000, but parameterLimit\u00a0(default: 1000) caps parsing to 1,000 parameters. With default options, the actual output is 1,000, not 10,000.\n\nImpact\n\nConsistency bug in arrayLimit\u00a0enforcement. With default parameterLimit, the practical DoS risk is negligible since parameterLimit\u00a0already caps the total number of parsed parameters (and thus array elements from bracket notation). The risk increases only when parameterLimit\u00a0is explicitly set to a very high value.",
+      "severity": "MEDIUM",
+      "cvss": 5.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "qs",
+      "fix": "Update to 6.14.1",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2025-15284"
+      ]
+    },
+    {
+      "id": "CVE-2022-24999",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "express: \"qs\" prototype poisoning causes the hang of the node process",
+      "description": "qs before 6.10.3, as used in Express before 4.17.3 and other products, allows attackers to cause a Node process hang for an Express application because an __ proto__ key can be used. In many typical Express use cases, an unauthenticated remote attacker can place the attack payload in the query string of the URL that is used to visit the application, such as a[__proto__]=b&a[__proto__]&a[length]=100000000. The fix was backported to qs 6.9.7, 6.8.3, 6.7.3, 6.6.1, 6.5.3, 6.4.1, 6.3.3, and 6.2.4 (and therefore Express 4.17.3, which has \"deps: qs@6.9.7\" in its release description, is not vulnerable).",
+      "severity": "HIGH",
+      "cvss": 7.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "qs",
+      "fix": "Update to 6.10.3, 6.9.7, 6.8.3, 6.7.3, 6.6.1, 6.5.3, 6.4.1, 6.3.3, 6.2.4",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2022-24999"
+      ]
+    },
+    {
+      "id": "CVE-2025-15284",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "qs: qs: Denial of Service via improper input validation in array parsing",
+      "description": "Improper Input Validation vulnerability in qs (parse modules) allows HTTP DoS.This issue affects qs: < 6.14.1.\n\n\nSummary\n\nThe arrayLimit\u00a0option in qs did not enforce limits for bracket notation (a[]=1&a[]=2), only for indexed notation (a[0]=1). This is a consistency bug; arrayLimit\u00a0should apply uniformly across all array notations.\n\nNote:\u00a0The default parameterLimit\u00a0of 1000 effectively mitigates the DoS scenario originally described. With default options, bracket notation cannot produce arrays larger than parameterLimit\u00a0regardless of arrayLimit, because each a[]=valueconsumes one parameter slot. The severity has been reduced accordingly.\n\nDetails\n\nThe arrayLimit\u00a0option only checked limits for indexed notation (a[0]=1&a[1]=2) but did not enforce it for bracket notation (a[]=1&a[]=2).\n\nVulnerable code\u00a0(lib/parse.js:159-162):\n\nif (root === '[]' && options.parseArrays) {\n    obj = utils.combine([], leaf);  // No arrayLimit check\n}\n\n\n\n\n\nWorking code\u00a0(lib/parse.js:175):\n\nelse if (index <= options.arrayLimit) {  // Limit checked here\n    obj = [];\n    obj[index] = leaf;\n}\n\n\n\n\n\nThe bracket notation handler at line 159 uses utils.combine([], leaf)\u00a0without validating against options.arrayLimit, while indexed notation at line 175 checks index <= options.arrayLimit\u00a0before creating arrays.\n\n\n\nPoC\n\nconst qs = require('qs');\nconst result = qs.parse('a[]=1&a[]=2&a[]=3&a[]=4&a[]=5&a[]=6', { arrayLimit: 5 });\nconsole.log(result.a.length);  // Output: 6 (should be max 5)\n\n\n\n\n\nNote on parameterLimit interaction:\u00a0The original advisory's \"DoS demonstration\" claimed a length of 10,000, but parameterLimit\u00a0(default: 1000) caps parsing to 1,000 parameters. With default options, the actual output is 1,000, not 10,000.\n\nImpact\n\nConsistency bug in arrayLimit\u00a0enforcement. With default parameterLimit, the practical DoS risk is negligible since parameterLimit\u00a0already caps the total number of parsed parameters (and thus array elements from bracket notation). The risk increases only when parameterLimit\u00a0is explicitly set to a very high value.",
+      "severity": "MEDIUM",
+      "cvss": 5.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "qs",
+      "fix": "Update to 6.14.1",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2025-15284"
+      ]
+    },
+    {
+      "id": "CVE-2023-28155",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "request: bypass of SSRF mitigations when following a cross-protocol redirect",
+      "description": "The Request package through 2.88.1 for Node.js allows a bypass of SSRF mitigations via an attacker-controller server that does a cross-protocol redirect (HTTP to HTTPS, or HTTPS to HTTP). NOTE: This vulnerability only affects products that are no longer supported by the maintainer.",
+      "severity": "MEDIUM",
+      "cvss": 6.1,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "request",
+      "fix": "Update to latest",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2023-28155"
+      ]
+    },
+    {
+      "id": "CVE-2015-8855",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-semver: npm Regular Expression Denial of Service during package versions parsing",
+      "description": "The semver package before 4.3.2 for Node.js allows attackers to cause a denial of service (CPU consumption) via a long version string, aka a \"regular expression denial of service (ReDoS).\"",
+      "severity": "MEDIUM",
+      "cvss": 7.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "semver",
+      "fix": "Update to >=4.3.2",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2015-8855"
+      ]
+    },
+    {
+      "id": "CVE-2022-25883",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-semver: Regular expression denial of service",
+      "description": "Versions of the package semver before 7.5.2 are vulnerable to Regular Expression Denial of Service (ReDoS) via the function new Range, when untrusted user data is provided as a range.\r\r\r",
+      "severity": "HIGH",
+      "cvss": 7.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "semver",
+      "fix": "Update to 7.5.2, 6.3.1, 5.7.2",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2022-25883"
+      ]
+    },
+    {
+      "id": "CVE-2022-25883",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-semver: Regular expression denial of service",
+      "description": "Versions of the package semver before 7.5.2 are vulnerable to Regular Expression Denial of Service (ReDoS) via the function new Range, when untrusted user data is provided as a range.\r\r\r",
+      "severity": "HIGH",
+      "cvss": 7.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "semver",
+      "fix": "Update to 7.5.2, 6.3.1, 5.7.2",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2022-25883"
+      ]
+    },
+    {
+      "id": "CVE-2024-43799",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "send: Code Execution Vulnerability in Send Library",
+      "description": "Send is a library for streaming files from the file system as a http response. Send passes untrusted user input to SendStream.redirect() which executes untrusted code. This issue is patched in send 0.19.0.",
+      "severity": "LOW",
+      "cvss": 4.7,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "send",
+      "fix": "Update to 0.19.0",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2024-43799"
+      ]
+    },
+    {
+      "id": "CVE-2024-43800",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "serve-static: Improper Sanitization in serve-static",
+      "description": "serve-static serves static files. serve-static passes untrusted user input - even after sanitizing it - to redirect() may execute untrusted code. This issue is patched in serve-static 1.16.0.",
+      "severity": "LOW",
+      "cvss": 4.7,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "serve-static",
+      "fix": "Update to 1.16.0, 2.1.0",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2024-43800"
+      ]
+    },
+    {
+      "id": "CVE-2019-10747",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-set-value: prototype pollution in function set-value",
+      "description": "set-value is vulnerable to Prototype Pollution in versions lower than 3.0.1. The function mixin-deep could be tricked into adding or modifying properties of Object.prototype using any of the constructor, prototype and _proto_ payloads.",
+      "severity": "CRITICAL",
+      "cvss": 9.8,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "set-value",
+      "fix": "Update to 2.0.1, 3.0.1",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2019-10747"
+      ]
+    },
+    {
+      "id": "CVE-2021-23440",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-set-value: type confusion allows bypass of CVE-2019-10747",
+      "description": "This affects the package set-value before <2.0.1, >=3.0.0 <4.0.1. A type confusion vulnerability can lead to a bypass of CVE-2019-10747 when the user-provided keys used in the path parameter are arrays.",
+      "severity": "HIGH",
+      "cvss": 9.8,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "set-value",
+      "fix": "Update to 4.0.1, 2.0.1, 3.0.3",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2021-23440"
+      ]
+    },
+    {
+      "id": "CVE-2019-10747",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-set-value: prototype pollution in function set-value",
+      "description": "set-value is vulnerable to Prototype Pollution in versions lower than 3.0.1. The function mixin-deep could be tricked into adding or modifying properties of Object.prototype using any of the constructor, prototype and _proto_ payloads.",
+      "severity": "CRITICAL",
+      "cvss": 9.8,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "set-value",
+      "fix": "Update to 2.0.1, 3.0.1",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2019-10747"
+      ]
+    },
+    {
+      "id": "CVE-2021-23440",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-set-value: type confusion allows bypass of CVE-2019-10747",
+      "description": "This affects the package set-value before <2.0.1, >=3.0.0 <4.0.1. A type confusion vulnerability can lead to a bypass of CVE-2019-10747 when the user-provided keys used in the path parameter are arrays.",
+      "severity": "HIGH",
+      "cvss": 9.8,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "set-value",
+      "fix": "Update to 4.0.1, 2.0.1, 3.0.3",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2021-23440"
+      ]
+    },
+    {
+      "id": "CVE-2025-9288",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "sha.js: Missing type checks leading to hash rewind and passing on crafted data",
+      "description": "Improper Input Validation vulnerability in sha.js allows Input Data Manipulation.This issue affects sha.js: through 2.4.11.",
+      "severity": "CRITICAL",
+      "cvss": 9.1,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "sha.js",
+      "fix": "Update to 2.4.12",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2025-9288"
+      ]
+    },
+    {
+      "id": "CVE-2014-3744",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "Directory Traversal",
+      "description": "Directory traversal vulnerability in the st module before 0.2.5 for Node.js allows remote attackers to read arbitrary files via a %2e%2e (encoded dot dot) in an unspecified path.",
+      "severity": "MEDIUM",
+      "cvss": 7.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "st",
+      "fix": "Update to >=0.2.5",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2014-3744"
+      ]
+    },
+    {
+      "id": "CVE-2017-16224",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "Open Redirect in st",
+      "description": "st is a module for serving static files. An attacker is able to craft a request that results in an HTTP 301 (redirect) to an entirely different domain. A request for: http://some.server.com//nodesecurity.org/%2e%2e would result in a 301 to //nodesecurity.org/%2e%2e which most browsers treat as a proper redirect as // is translated into the current schema being used. Mitigating factor: In order for this to work, st must be serving from the root of a server (/) rather than the typical sub directory (/static/) and the redirect URL will end with some form of URL encoded .. (\"%2e%2e\", \"%2e.\", \".%2e\").",
+      "severity": "MEDIUM",
+      "cvss": 6.1,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "st",
+      "fix": "Update to 1.2.2",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2017-16224"
+      ]
+    },
+    {
+      "id": "CVE-2023-26136",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "tough-cookie: prototype pollution in cookie memstore",
+      "description": "Versions of the package tough-cookie before 4.1.3 are vulnerable to Prototype Pollution due to improper handling of Cookies when using CookieJar in rejectPublicSuffixes=false mode. This issue arises from the manner in which the objects are initialized.",
+      "severity": "MEDIUM",
+      "cvss": 9.8,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "tough-cookie",
+      "fix": "Update to 4.1.3",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2023-26136"
+      ]
+    },
+    {
+      "id": "CVE-2020-8158",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "TypeORM vulnerable to MAID and Prototype Pollution",
+      "description": "Prototype pollution vulnerability in the TypeORM package < 0.2.25 may allow attackers to add or modify Object properties leading to further denial of service or SQL injection attacks.",
+      "severity": "CRITICAL",
+      "cvss": 9.8,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "typeorm",
+      "fix": "Update to 0.2.25",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2020-8158"
+      ]
+    },
+    {
+      "id": "CVE-2022-33171",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "SQL injection in typeORM",
+      "description": "The findOne function in TypeORM before 0.3.0 can either be supplied with a string or a FindOneOptions object. When input to the function is a user-controlled parsed JSON object, supplying a crafted FindOneOptions instead of an id string leads to SQL injection. NOTE: the vendor's position is that the user's application is responsible for input validation",
+      "severity": "CRITICAL",
+      "cvss": 9.8,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "typeorm",
+      "fix": "Update to 0.3.0",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2022-33171"
+      ]
+    },
+    {
+      "id": "CVE-2025-60542",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "TypeORM: SQL Injection via crafted request to repository.save or repository.update",
+      "description": "SQL Injection vulnerability in TypeORM before 0.3.26 via crafted request to repository.save or repository.update due to the sqlstring call using stringifyObjects default to false.",
+      "severity": "HIGH",
+      "cvss": 8.0,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "typeorm",
+      "fix": "Update to 0.3.26",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2025-60542"
+      ]
+    },
+    {
+      "id": "CVE-2021-23358",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-underscore: Arbitrary code execution via the template function",
+      "description": "The package underscore from 1.13.0-0 and before 1.13.0-2, from 1.3.2 and before 1.12.1 are vulnerable to Arbitrary Code Injection via the template function, particularly when a variable property is passed as an argument as it is not sanitized.",
+      "severity": "CRITICAL",
+      "cvss": 7.2,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "underscore",
+      "fix": "Update to 1.12.1",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2021-23358"
+      ]
+    },
+    {
+      "id": "CVE-2026-27601",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "Underscore.js: Underscore.js: Denial of Service via recursive data structures in flatten and isEqual functions",
+      "description": "Underscore.js is a utility-belt library for JavaScript. Prior to 1.13.8, the _.flatten and _.isEqual functions use recursion without a depth limit. Under very specific conditions, detailed below, an attacker could exploit this in a Denial of Service (DoS) attack by triggering a stack overflow. Untrusted input must be used to create a recursive datastructure, for example using JSON.parse, with no enforced depth limit. The datastructure thus created must be passed to _.flatten or _.isEqual. In the case of _.flatten, the vulnerability can only be exploited if it is possible for a remote client to prepare a datastructure that consists of arrays at all levels AND if no finite depth limit is passed as the second argument to _.flatten. In the case of _.isEqual, the vulnerability can only be exploited if there exists a code path in which two distinct datastructures that were submitted by the same remote client are compared using _.isEqual. For example, if a client submits data that are stored in a database, and the same client can later submit another datastructure that is then compared to the data that were saved in the database previously, OR if a client submits a single request, but its data are parsed twice, creating two non-identical but equivalent datastructures that are then compared. Exceptions originating from the call to _.flatten or _.isEqual, as a result of a stack overflow, are not being caught. This vulnerability is fixed in 1.13.8.",
+      "severity": "HIGH",
+      "cvss": 7.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "underscore",
+      "fix": "Update to 1.13.8",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2026-27601"
+      ]
+    },
+    {
+      "id": "CVE-2025-12758",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "Validator is Vulnerable to Incomplete Filtering of One or More Instances of Special Elements",
+      "description": "Versions of the package validator before 13.15.22 are vulnerable to Incomplete Filtering of One or More Instances of Special Elements in the isLength() function that does not take into account Unicode variation selectors (\\uFE0F, \\uFE0E) appearing in a sequence which lead to improper string length calculation. This can lead to an application using isLength for input validation accepting strings significantly longer than intended, resulting in issues like data truncation in databases, buffer overflows in other system components, or denial-of-service.",
+      "severity": "HIGH",
+      "cvss": 8.0,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "validator",
+      "fix": "Update to 13.15.22",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2025-12758"
+      ]
+    },
+    {
+      "id": "CVE-2021-3765",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "validator: Inefficient Regular Expression Complexity in Validator.js",
+      "description": "validator.js is vulnerable to Inefficient Regular Expression Complexity",
+      "severity": "MEDIUM",
+      "cvss": 7.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "validator",
+      "fix": "Update to 13.7.0",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2021-3765"
+      ]
+    },
+    {
+      "id": "CVE-2025-56200",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "validator.js has a URL validation bypass vulnerability in its isURL function",
+      "description": "A URL validation bypass vulnerability exists in validator.js through version 13.15.15. The isURL() function uses '://' as a delimiter to parse protocols, while browsers use ':' as the delimiter. This parsing difference allows attackers to bypass protocol and domain validation by crafting URLs leading to XSS and Open Redirect attacks.",
+      "severity": "MEDIUM",
+      "cvss": 5.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "validator",
+      "fix": "Update to 13.15.20",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2025-56200"
+      ]
+    },
+    {
+      "id": "GHSA-xx4c-jj58-r7x6",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "Inefficient Regular Expression Complexity in Validator.js",
+      "description": "### Impact\nVersions of `validator` prior to 13.7.0 are affected by an inefficient Regular Expression complexity  when using the `rtrim` and `trim` sanitizers.\n\n### Patches\nThe problem has been patched in validator 13.7.0",
+      "severity": "MEDIUM",
+      "cvss": 5.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "validator",
+      "fix": "Update to 13.7.0",
+      "references": [
+        "https://github.com/advisories/GHSA-xx4c-jj58-r7x6"
+      ]
+    },
+    {
+      "id": "CVE-2023-0842",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "node-xml2js: xml2js is vulnerable to prototype pollution",
+      "description": "xml2js version 0.4.23 allows an external attacker to edit or add new properties to an object. This is possible because the application does not properly validate incoming JSON keys, thus allowing the __proto__ property to be edited.",
+      "severity": "MEDIUM",
+      "cvss": 5.3,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "xml2js",
+      "fix": "Update to 0.5.0",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2023-0842"
+      ]
+    },
+    {
+      "id": "CVE-2020-7774",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-y18n: prototype pollution vulnerability",
+      "description": "The package y18n before 3.2.2, 4.0.1 and 5.0.5, is vulnerable to Prototype Pollution.",
+      "severity": "HIGH",
+      "cvss": 9.8,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "y18n",
+      "fix": "Update to 3.2.2, 4.0.1, 5.0.5",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2020-7774"
+      ]
+    },
+    {
+      "id": "CVE-2020-7774",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-y18n: prototype pollution vulnerability",
+      "description": "The package y18n before 3.2.2, 4.0.1 and 5.0.5, is vulnerable to Prototype Pollution.",
+      "severity": "HIGH",
+      "cvss": 9.8,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "y18n",
+      "fix": "Update to 3.2.2, 4.0.1, 5.0.5",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2020-7774"
+      ]
+    },
+    {
+      "id": "CVE-2020-7608",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-yargs-parser: prototype pollution vulnerability",
+      "description": "yargs-parser could be tricked into adding or modifying properties of Object.prototype using a \"__proto__\" payload.",
+      "severity": "MEDIUM",
+      "cvss": 5.3,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "yargs-parser",
+      "fix": "Update to 13.1.2, 15.0.1, 18.1.1, 5.0.1",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2020-7608"
+      ]
+    },
+    {
+      "id": "CVE-2020-7608",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "nodejs-yargs-parser: prototype pollution vulnerability",
+      "description": "yargs-parser could be tricked into adding or modifying properties of Object.prototype using a \"__proto__\" payload.",
+      "severity": "MEDIUM",
+      "cvss": 5.3,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "yargs-parser",
+      "fix": "Update to 13.1.2, 15.0.1, 18.1.1, 5.0.1",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2020-7608"
+      ]
+    },
+    {
+      "id": "DL3059",
+      "tool": "hadolint",
+      "category": "infra",
+      "title": "Docker Practice: DL3059",
+      "description": "Multiple consecutive `RUN` instructions. Consider consolidation.",
+      "severity": "INFO",
+      "cvss": 3.0,
+      "file": "/src/Dockerfile",
+      "line": 5,
+      "evidence": "DL3059",
+      "fix": "Fix Dockerfile.",
+      "references": []
+    },
+    {
+      "id": "DL3059",
+      "tool": "hadolint",
+      "category": "infra",
+      "title": "Docker Practice: DL3059",
+      "description": "Multiple consecutive `RUN` instructions. Consider consolidation.",
+      "severity": "INFO",
+      "cvss": 3.0,
+      "file": "/src/Dockerfile",
+      "line": 10,
+      "evidence": "DL3059",
+      "fix": "Fix Dockerfile.",
+      "references": []
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+[
+  {
+    "code": "DL3059",
+    "column": 1,
+    "file": "/src/Dockerfile",
+    "level": "info",
+    "line": 5,
+    "message": "Multiple consecutive `RUN` instructions. Consider consolidation."
+  },
+  {
+    "code": "DL3059",
+    "column": 1,
+    "file": "/src/Dockerfile",
+    "level": "info",
+    "line": 10,
+    "message": "Multiple consecutive `RUN` instructions. Consider consolidation."
+  }
+]

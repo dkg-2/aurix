@@ -145,7 +145,8 @@ def _normalize_results(scan_id, raw_results):
 
     return {
         "scan_id": scan_id, "timestamp": datetime.now(timezone.utc).isoformat(),
-        "total_findings": len(unified), "findings": unified
+        "total_findings": len(unified), "findings": unified,
+        "workspace_path": src_path
     }
 
 def _remove_readonly(func, path, excinfo):
@@ -156,12 +157,13 @@ def _remove_readonly(func, path, excinfo):
 
 # --- PUBLIC INTERFACE ---
 
-def orchestrate_scan(repo_url):
+def orchestrate_scan(repo_url, cleanup=True):
     """
     Primary entry point for the Security Engine.
     Performs Cloning -> Parallel Scanning -> Normalization -> Cleanup.
     Returns: Dict (Final Unified Report)
     """
+    # ... rest of the setup logic ...
     # System Pre-check
     try:
         subprocess.run("docker version", shell=True, check=True, capture_output=True)
@@ -210,11 +212,14 @@ def orchestrate_scan(repo_url):
     print(f"[INFO] Final report path: {report_path}")
 
     # 4. Cleanup
-    print("[INFO] Purging temporary workspace...")
-    try:
-        shutil.rmtree(scan_workspace, onerror=_remove_readonly)
-    except Exception:
-        pass
+    if cleanup:
+        print("[INFO] Purging temporary workspace...")
+        try:
+            shutil.rmtree(scan_workspace, onerror=_remove_readonly)
+        except Exception:
+            pass
+    else:
+        print(f"[INFO] Cleanup skipped. Workspace preserved at: {scan_workspace}")
     
     return report
 

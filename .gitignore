@@ -1,18 +1,28 @@
-# Virtual Environment
-fyp-venv/
-venv/
-.venv/
+# Environment & Secrets
+.env
+.env.*
+
+# Python
 __pycache__/
 *.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+*.egg
+venv/
+fyp-venv/
 
-# Workspaces and Temporary Clones
-workspace/
-test-subject/
-test-subject-goof/
+# Workspace (cloned repos during scans)
+new work/workspace/
 
-# OS specific
-.DS_Store
+# IDE
+.vscode/
+.idea/
+
+# OS
 Thumbs.db
+.DS_Store
 
-# Sensitive local config (if any)
-.env
+# Gemini/Antigravity
+.gemini/

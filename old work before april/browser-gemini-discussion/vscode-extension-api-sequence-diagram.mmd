@@ -1,0 +1,36 @@
+sequenceDiagram
+    autonumber
+
+    actor Dev as User (VS Code)
+    participant Ext as VS Code Extension
+    participant API as Backend API (Render)
+    participant DB as Supabase (DB & Storage)
+    participant Q as Redis Queue (Upstash)
+    participant Worker as Worker Node (Local/Cloud)
+
+    Dev->>Ext: Clicks "Scan Local Code"
+    Ext->>Ext: Zips code (Ignores node_modules)
+
+    Note over Ext,API: POST /api/scans/upload
+    Ext->>API: Uploads payload.zip
+
+    API->>DB: Saves Zip to Storage and Creates Scan (Status PENDING)
+    API->>Q: Pushes Job Ticket to Queue
+    API-->>Ext: Returns 202 Accepted + scan_id
+
+    loop Every 5 Seconds
+        Note over Ext,API: GET /api/scans/{scan_id}
+        Ext->>API: Is it done yet
+        API-->>Ext: Status SCANNING
+    end
+
+    Q->>Worker: Pulls Job Ticket
+    Worker->>DB: Downloads payload.zip
+    Note right of Worker: Runs Scan Engine and LangGraph Agents
+
+    Worker->>API: Webhook Sends Final Verified Bugs
+    API->>DB: Updates Scan Status to COMPLETED and Saves Bugs
+
+    Ext->>API: Is it done yet
+    API-->>Ext: Status COMPLETED with Bug List Payload
+    Ext->>Dev: Displays Bugs and Applies Patch in Editor

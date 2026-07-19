@@ -54,15 +54,23 @@ When a user scans a repository, Bhavya's backend will eventually pass this exact
 
 ## 💻 What You Need to Build
 
-### 1. The Web Dashboard (Bhumika/Divyanshi)
-Using the JSON above, you need to build a sleek React dashboard:
-*   **Header:** Display the `url`, the `timestamp`, and the `summary` metrics (e.g., "12 Total Bugs Found", "8 Successfully Patched by AI").
-*   **Vulnerability Table:** A list rendering the `findings` array. Columns should include `Title`, `Severity`, `File`, and `Wargame Status`.
-*   **AI Attack/Defense Viewer:** When a user clicks a row in the table, open a modal or side-panel showing the `ai_analysis` text, and render the `patch` inside a nice syntax-highlighted code block!
+Although you share the same JSON output from the AI Engine, your roles operate in completely different domains.
 
-### 2. The VS Code Extension
-The extension will pull this exact same JSON.
-*   **Inline Squigglies:** The extension should read `file` and `line` (e.g., `database/queries.py`, line 42) and highlight that exact line in the developer's VS Code editor.
-*   **Hover Action:** When the developer hovers over the highlighted line, a popup should display the `ai_analysis` and offer a "1-Click Apply Fix" button that automatically injects the `patch` string into their file!
+### 🌐 Bhumika (Web Dashboard Developer)
+*Reference: `Role Doc for Bhumika.pdf`*
 
-> **Action Item for Frontend Team:** You can copy the JSON snippet above into a file named `mock_data.json` in your React project today. Start building the UI and passing this mock data into your components. When Bhavya finishes the backend API, you will just swap the mock file out for a real `fetch()` request!
+Your job is to build the primary visual "Face" of AURIX using React/Next.js. You will consume the JSON output above from Bhavya's backend to build:
+*   **Dual-Mode Ingestion UI:** A form to paste a GitHub URL (which triggers Bhavya's API) and a GitHub OAuth flow to list repositories.
+*   **Results Dashboard (Kanban):** Map the `findings` array into a Kanban board where users can filter vulnerabilities by `severity` and sort them by `wargame_status` (Open, Resolved, Ignored).
+*   **Contextual AI Chat Assistant:** A slide-out panel that uses the `ai_analysis` text to allow users to ask follow-up questions about the specific vulnerability.
+*   **One-Click Pull Requests:** A "Remediate" button that takes the `patch` string and automatically branches the user's GitHub repository via the GitHub REST API.
+*   **Blocker Note:** You are blocked by Bhavya. Ask her for a mock API endpoint immediately so you can start building the polling logic and Kanban board!
+
+### ⚙️ Divyanshi (IDE & Integration Engineer)
+*Reference: `Role Doc for Divyanshi.pdf`*
+
+Your job is to bring AURIX directly into the developer's local machine by building the VS Code Extension.
+*   **Zip & Ship Logic:** You must write the local file-system logic to zip the developer's workspace and POST it to Bhavya's API. *Crucial:* You must enforce `.gitignore` rules to prevent zipping massive `node_modules` folders, which will crash the AI Engine!
+*   **Editor UI Diagnostics:** Once your polling loop receives the JSON report above, use the VS Code Diagnostics API. Parse the `file` and `line` fields to underline the exact vulnerable code with red squiggly lines in the user's editor.
+*   **"Quick Fix" Auto-Patcher:** Implement the `CodeActionProvider`. When a user clicks the yellow lightbulb over the red squiggly line, take the `patch` string from the JSON and safely inject the fix directly into their local file!
+*   **Blocker Note:** You are also blocked by Bhavya for the upload endpoints, but you MUST coordinate with Divyansh! The `.zip` file your extension uploads must unzip into a folder structure that exactly matches what Divyansh's AI Engine expects to scan.

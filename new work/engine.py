@@ -70,9 +70,9 @@ def _run_docker_tool(name, args_str, src_path, output_path):
         # Handle Windows paths correctly if the host is Windows (avoid backslash in f-string expression for Python < 3.12)
         clean_host = host_workspace.rstrip('/\\')
         host_src_path = f"{clean_host}/{folder_name}"
-        cmd = f'docker run --rm -v "{host_src_path}:/src" {IMAGE_NAME} {args_str}'
+        cmd = f'docker run --rm --entrypoint "" -v "{host_src_path}:/src" {IMAGE_NAME} {args_str}'
     else:
-        cmd = f'docker run --rm -v "{src_path}:/src" {IMAGE_NAME} {args_str}'
+        cmd = f'docker run --rm --entrypoint "" -v "{src_path}:/src" {IMAGE_NAME} {args_str}'
 
     print(f"[DEBUG] Executing: {cmd}")
     try:

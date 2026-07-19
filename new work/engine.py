@@ -214,14 +214,14 @@ def orchestrate_scan(repo_url, cleanup=True):
     _run_docker_tool("Hadolint", "hadolint --format json /src/Dockerfile", scan_workspace, raw_outputs['hadolint'])
 
     # --- ARCHIVE: Parallel Execution (Uncomment if using Oracle Cloud 24GB RAM instance) ---
-    # threads = [
-    #     threading.Thread(target=_run_docker_tool, args=("Opengrep", "opengrep scan --config auto --json", scan_workspace, raw_outputs['opengrep'])),
-    #     threading.Thread(target=_run_docker_tool, args=("Trivy", "trivy fs /src --format json", scan_workspace, raw_outputs['trivy'])),
-    #     threading.Thread(target=_run_docker_tool, args=("Gitleaks", "gitleaks detect --source=/src --report-format=json --report-path=- --no-git", scan_workspace, raw_outputs['gitleaks'])),
-    #     threading.Thread(target=_run_docker_tool, args=("Hadolint", "hadolint --format json /src/Dockerfile", scan_workspace, raw_outputs['hadolint']))
-    # ]
-    # for t in threads: t.start()
-    # for t in threads: t.join()
+    threads = [
+        threading.Thread(target=_run_docker_tool, args=("Opengrep", "opengrep scan --config auto --json", scan_workspace, raw_outputs['opengrep'])),
+        threading.Thread(target=_run_docker_tool, args=("Trivy", "trivy fs /src --format json", scan_workspace, raw_outputs['trivy'])),
+        threading.Thread(target=_run_docker_tool, args=("Gitleaks", "gitleaks detect --source=/src --report-format=json --report-path=- --no-git", scan_workspace, raw_outputs['gitleaks'])),
+        threading.Thread(target=_run_docker_tool, args=("Hadolint", "hadolint --format json /src/Dockerfile", scan_workspace, raw_outputs['hadolint']))
+    ]
+    for t in threads: t.start()
+    for t in threads: t.join()
     # ----------------------------------------------------------------------------------------
 
     # 3. Normalization

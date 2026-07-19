@@ -11,7 +11,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./verified-results:/app/verified-results
       # Map the host workspace directly so the daemon can access the clones
-      - ${HOST_WORKSPACE_DIR:-./workspace}:/app/workspace
+      - "/home/ubuntu/aurix/new work/workspace:/app/workspace"
     env_file:
       - .env
 

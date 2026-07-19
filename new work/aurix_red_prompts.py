@@ -21,6 +21,7 @@ Demonstrate the impact of a potential vulnerability by generating a safe, contro
 """
 
 FEW_SHOT_LOGIC_EXAMPLE = """
+--- EXAMPLE 1: COMMAND INJECTION ---
 FINDING: Potential Command Injection in views.py
 CODE: subprocess.Popen(cmd + " " + user_input, shell=True)
 
@@ -51,6 +52,72 @@ except Exception:
     pass
 
 sys.exit(1) # Not proven
+```
+
+--- EXAMPLE 2: SSRF (SERVER SIDE REQUEST FORGERY) ---
+FINDING: dynamic-urllib-use-detected
+CODE: urllib.request.urlopen(params["url"]).read()
+
+VALIDATION SCRIPT:
+```python
+import sys
+import ast
+
+# Analysis: Sink is urllib.request.urlopen.
+# Strategy: Use Python's AST (Abstract Syntax Tree) to reliably detect if the URL argument comes from an unsanitized request parameter or dict lookup.
+
+source_file = "/src/app.py"
+
+def check_ssrf(tree):
+    for node in ast.walk(tree):
+        # Look for urllib.request.urlopen
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute):
+            if node.func.attr == "urlopen":
+                # Check if the first argument is a dictionary lookup (e.g., params['url'] or request.get('url'))
+                arg = node.args[0] if node.args else None
+                if isinstance(arg, ast.Subscript) or (isinstance(arg, ast.Call) and getattr(arg.func, 'attr', '') == 'get'):
+                    return True
+    return False
+
+try:
+    with open(source_file, "r") as f:
+        tree = ast.parse(f.read())
+        
+    if check_ssrf(tree):
+        print("VALIDATION_SUCCESS: Unsanitized input reaches urllib.request.urlopen.")
+        sys.exit(0)
+except Exception as e:
+    print(f"VALIDATION_ERROR: {e}")
+
+sys.exit(1)
+```
+
+--- EXAMPLE 3: INSECURE DESERIALIZATION (PICKLE) ---
+FINDING: avoid-pickle
+CODE: pickle.loads(user_data)
+
+VALIDATION SCRIPT:
+```python
+import sys
+import re
+
+# Analysis: Sink is pickle.loads() or pickle.load() taking untrusted data.
+# Strategy: Use regex to verify pickle.loads is called on a variable that originates from user input (like params, request, payload) without cryptographic signing.
+
+source_file = "/src/server.py"
+try:
+    with open(source_file, "r") as f:
+        content = f.read()
+
+    # Look for pickle.loads() where the argument matches common user input variable names
+    pattern = r"pickle\\.loads\\s*\\(\\s*(params|request|payload|data|user_input)[^\\]\\)]*"
+    if re.search(pattern, content, re.IGNORECASE):
+        print("VALIDATION_SUCCESS: Found pickle.loads executing directly on untrusted user data structure.")
+        sys.exit(0)
+except Exception:
+    pass
+
+sys.exit(1)
 ```
 """
 

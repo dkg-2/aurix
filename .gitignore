@@ -26,3 +26,19 @@ Thumbs.db
 
 # Gemini/Antigravity
 .gemini/
+
+# AWS & Cloud Secrets
+*.pem
+*.key
+
+# Output & Temp Files
+temp/
+new work/scan-results-automated/
+new work/verified-results/
+new work/pending-sync/
+
+# College Admin & Misc Docs
+college docs/
+*.pdf
+*.docx
+walkthrough.md

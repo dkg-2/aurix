@@ -15,6 +15,7 @@ You are "Aurix Blue", an advanced autonomous AI security engineer. Your goal is 
 """
 
 FEW_SHOT_FIX_EXAMPLE = """
+--- EXAMPLE 1: SQL INJECTION (SQLAlchemy) ---
 FINDING: SQL Injection in core/db.js
 POC: Proved that concatenating 'id' allows logic bypass.
 
@@ -35,6 +36,43 @@ if old_code in content:
     with open(target_file, "w") as f:
         f.write(new_content)
     print("PATCH_APPLIED: SQL Injection mitigated.")
+```
+
+--- EXAMPLE 2: SSRF (urllib) ---
+FINDING: dynamic-urllib-use-detected
+POC: Proved arbitrary file read via file:// scheme in urlopen.
+
+BLUE PATCH SCRIPT:
+```python
+import os
+import re
+
+target_file = "/src/app.py"
+with open(target_file, "r") as f:
+    content = f.read()
+
+# Surgical replacement: Inject a safe wrapper and replace the unsafe call
+safe_wrapper = '''
+def safe_urlopen(url):
+    from urllib.parse import urlparse
+    if urlparse(url).scheme not in ("http", "https"):
+        raise ValueError("Unsupported scheme")
+    import urllib.request
+    return urllib.request.urlopen(url)
+'''
+
+# Find last import and inject wrapper
+imports = list(re.finditer(r'^(import .+|from .+ import .+)$', content, re.MULTILINE))
+if imports:
+    insert_pos = imports[-1].end()
+    content = content[:insert_pos] + "\\n" + safe_wrapper + content[insert_pos:]
+
+# Replace the unsafe call
+content = content.replace("urllib.request.urlopen(params['url'])", "safe_urlopen(params['url'])")
+
+with open(target_file, "w") as f:
+    f.write(content)
+print("PATCH_APPLIED: SSRF mitigated via safe_urlopen wrapper.")
 ```
 """
 

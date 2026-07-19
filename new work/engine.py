@@ -61,8 +61,20 @@ def _load_json(path):
 def _run_docker_tool(name, args_str, src_path, output_path):
     """Generic wrapper to execute security tools via Docker."""
     print(f"[INFO] [{name}] Initializing scan...")
-    cmd = f'docker run --rm -v "{src_path}:/src" {IMAGE_NAME} {args_str}'
+    
+    # Docker-out-of-Docker Path Resolution Fix
+    host_workspace = os.getenv("HOST_WORKSPACE_DIR")
+    if host_workspace:
+        # If running in Docker, we must map the Host's directory path to the Daemon, not the container's internal path
+        folder_name = os.path.basename(src_path)
+        # Handle Windows paths correctly if the host is Windows (avoid backslash in f-string expression for Python < 3.12)
+        clean_host = host_workspace.rstrip('/\\')
+        host_src_path = f"{clean_host}/{folder_name}"
+        cmd = f'docker run --rm -v "{host_src_path}:/src" {IMAGE_NAME} {args_str}'
+    else:
+        cmd = f'docker run --rm -v "{src_path}:/src" {IMAGE_NAME} {args_str}'
 
+    print(f"[DEBUG] Executing: {cmd}")
     try:
         result = subprocess.run(cmd, shell=True, capture_output=True, text=True, encoding='utf-8')
         stdout = result.stdout.strip()
@@ -191,20 +203,26 @@ def orchestrate_scan(repo_url, cleanup=True):
         print(f"[ERROR] Failed to execute git: {e}")
         return None
 
-    # 2. Parallel Execution
+    # 2. Sequential Execution (Optimized for 1GB RAM AWS/GCP Servers)
     os.makedirs(RESULTS_DIR, exist_ok=True)
     raw_outputs = {k: os.path.join(RESULTS_DIR, f"{scan_id}_{k}.json") for k in ["opengrep", "trivy", "gitleaks", "hadolint"]}
     raw_outputs['workspace_path'] = scan_workspace # Attach for normalization pass-through
     
-    threads = [
-        threading.Thread(target=_run_docker_tool, args=("Opengrep", "opengrep scan --config auto --json", scan_workspace, raw_outputs['opengrep'])),
-        threading.Thread(target=_run_docker_tool, args=("Trivy", "trivy fs /src --format json", scan_workspace, raw_outputs['trivy'])),
-        threading.Thread(target=_run_docker_tool, args=("Gitleaks", "gitleaks detect --source=/src --report-format=json --report-path=- --no-git", scan_workspace, raw_outputs['gitleaks'])),
-        threading.Thread(target=_run_docker_tool, args=("Hadolint", "hadolint --format json /src/Dockerfile", scan_workspace, raw_outputs['hadolint']))
-    ]
+    _run_docker_tool("Opengrep", "opengrep scan --config auto --json", scan_workspace, raw_outputs['opengrep'])
+    _run_docker_tool("Trivy", "trivy fs /src --format json", scan_workspace, raw_outputs['trivy'])
+    _run_docker_tool("Gitleaks", "gitleaks detect --source=/src --report-format=json --report-path=- --no-git", scan_workspace, raw_outputs['gitleaks'])
+    _run_docker_tool("Hadolint", "hadolint --format json /src/Dockerfile", scan_workspace, raw_outputs['hadolint'])
 
-    for t in threads: t.start()
-    for t in threads: t.join()
+    # --- ARCHIVE: Parallel Execution (Uncomment if using Oracle Cloud 24GB RAM instance) ---
+    # threads = [
+    #     threading.Thread(target=_run_docker_tool, args=("Opengrep", "opengrep scan --config auto --json", scan_workspace, raw_outputs['opengrep'])),
+    #     threading.Thread(target=_run_docker_tool, args=("Trivy", "trivy fs /src --format json", scan_workspace, raw_outputs['trivy'])),
+    #     threading.Thread(target=_run_docker_tool, args=("Gitleaks", "gitleaks detect --source=/src --report-format=json --report-path=- --no-git", scan_workspace, raw_outputs['gitleaks'])),
+    #     threading.Thread(target=_run_docker_tool, args=("Hadolint", "hadolint --format json /src/Dockerfile", scan_workspace, raw_outputs['hadolint']))
+    # ]
+    # for t in threads: t.start()
+    # for t in threads: t.join()
+    # ----------------------------------------------------------------------------------------
 
     # 3. Normalization
     print("[INFO] Normalizing multi-layer findings into unified schema...")

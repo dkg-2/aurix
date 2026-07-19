@@ -1,0 +1,32 @@
+# Use an official Python runtime as a parent image
+FROM python:3.11-slim
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies (docker client is needed if engine spawns sandbox containers)
+RUN apt-get update && apt-get install -y \
+    curl \
+    git \
+    docker.io \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements first for better caching
+COPY requirements.engine.txt .
+RUN pip install --no-cache-dir -r requirements.engine.txt
+
+# Copy the rest of the application
+COPY . .
+
+# Ensure the results directory exists
+RUN mkdir -p /app/verified-results
+
+# Define environment variables
+ENV PYTHONUNBUFFERED=1
+ENV AURIX_WEBHOOK_URL="http://host.docker.internal:8000/api/v1/scans/webhook"
+ENV AURIX_WEBHOOK_TOKEN="aurix-dev-token"
+
+# By default, we just drop into a shell, or we could set the entrypoint.
+# For a worker that triggers on demand, we might run an infinite loop queue listener later,
+# but for now, we just allow the user to execute `python aurix_worker.py <url>` inside it.
+ENTRYPOINT ["python", "aurix_worker.py"]

@@ -1,6 +1,7 @@
 import os
 import json
 import sys
+import requests
 from datetime import datetime
 
 # Import local components
@@ -76,11 +77,40 @@ class AurixWorker:
         with open(output_path, "w") as f:
             json.dump(final_report, f, indent=2)
 
+        # 5. Webhook Handoff (Send to Bhavya's Backend)
+        webhook_url = os.getenv("AURIX_WEBHOOK_URL", "http://localhost:8000/api/v1/scans/webhook")
+        webhook_token = os.getenv("AURIX_WEBHOOK_TOKEN", "aurix-dev-token")
+        
+        print(f"\n[STEP 5] Sending JSON Payload to Backend API -> {webhook_url}")
+        try:
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {webhook_token}"
+            }
+            response = requests.post(webhook_url, json=final_report, headers=headers, timeout=10)
+            if response.status_code == 200:
+                print("   [+] Webhook POST successful!")
+            else:
+                print(f"   [-] Webhook POST failed with status: {response.status_code} - {response.text}")
+                self._save_dead_letter(final_report, scan_id)
+        except Exception as e:
+            print(f"   [-] Webhook Exception: {e}")
+            self._save_dead_letter(final_report, scan_id)
+
         print(f"\n[DONE] LangGraph Audit Complete.")
         print(f"Total Findings: {len(final_findings)}")
         print(f"Neutralized: {final_report['summary']['neutralized_count']}")
-        print(f"Report: {output_path}")
+        print(f"Report saved locally: {output_path}")
         return final_report
+
+    def _save_dead_letter(self, report, scan_id):
+        """Saves reports that failed to sync to the webhook so they can be retried later."""
+        dlq_dir = "pending-sync"
+        os.makedirs(dlq_dir, exist_ok=True)
+        dlq_path = os.path.join(dlq_dir, f"failed_sync_{scan_id}.json")
+        with open(dlq_path, "w") as f:
+            json.dump(report, f, indent=2)
+        print(f"   [!] Saved to Dead Letter Queue: {dlq_path}")
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:

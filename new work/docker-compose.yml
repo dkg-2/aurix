@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  aurix-engine:
+    build:
+      context: .
+      dockerfile: Dockerfile.engine
+    container_name: aurix_ai_worker
+    # Mount the docker socket so the Engine can spawn Sandbox containers
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./verified-results:/app/verified-results
+      # Map the host workspace directly so the daemon can access the clones
+      - ${HOST_WORKSPACE_DIR:-./workspace}:/app/workspace
+    env_file:
+      - .env
+
+    # We override the command so the container stays alive in the background
+    # allowing you to `docker exec` into it and run scans manually for now.
+    entrypoint: [ "tail", "-f", "/dev/null" ]

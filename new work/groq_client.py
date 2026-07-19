@@ -32,9 +32,12 @@ class AurixGroqClient:
         print(f"[SYSTEM] AI Engine using Key #{self.current_key_index + 1}")
 
     def rotate_key(self):
-        """Switches to the next API key in the list."""
+        """Switches to the next API key in the list and waits for rate limit reset."""
         if len(self.api_keys) > 1:
             self.current_key_index = (self.current_key_index + 1) % len(self.api_keys)
+            import time
+            print(f"[WARN] Groq API rate limit reached. Sleeping 10s before trying Key #{self.current_key_index + 1}...")
+            time.sleep(10)
             self._init_client()
             return True
         return False

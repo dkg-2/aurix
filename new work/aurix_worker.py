@@ -101,6 +101,19 @@ class AurixWorker:
         print(f"Total Findings: {len(final_findings)}")
         print(f"Neutralized: {final_report['summary']['neutralized_count']}")
         print(f"Report saved locally: {output_path}")
+
+        # 6. Final Cleanup
+        print(f"[INFO] Purging temporary workspace to save storage...")
+        try:
+            import shutil
+            def _remove_readonly(func, path, excinfo):
+                import stat
+                os.chmod(path, stat.S_IWRITE)
+                func(path)
+            shutil.rmtree(workspace_path, onerror=_remove_readonly)
+        except Exception as e:
+            print(f"[WARN] Failed to purge workspace: {e}")
+
         return final_report
 
     def _save_dead_letter(self, report, scan_id):

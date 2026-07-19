@@ -208,10 +208,10 @@ def orchestrate_scan(repo_url, cleanup=True):
     raw_outputs = {k: os.path.join(RESULTS_DIR, f"{scan_id}_{k}.json") for k in ["opengrep", "trivy", "gitleaks", "hadolint"]}
     raw_outputs['workspace_path'] = scan_workspace # Attach for normalization pass-through
     
-    _run_docker_tool("Opengrep", "opengrep scan --config auto --json", scan_workspace, raw_outputs['opengrep'])
-    _run_docker_tool("Trivy", "trivy fs /src --format json", scan_workspace, raw_outputs['trivy'])
-    _run_docker_tool("Gitleaks", "gitleaks detect --source=/src --report-format=json --report-path=- --no-git", scan_workspace, raw_outputs['gitleaks'])
-    _run_docker_tool("Hadolint", "hadolint --format json /src/Dockerfile", scan_workspace, raw_outputs['hadolint'])
+    # _run_docker_tool("Opengrep", "opengrep scan --config auto --json", scan_workspace, raw_outputs['opengrep'])
+    # _run_docker_tool("Trivy", "trivy fs /src --format json", scan_workspace, raw_outputs['trivy'])
+    # _run_docker_tool("Gitleaks", "gitleaks detect --source=/src --report-format=json --report-path=- --no-git", scan_workspace, raw_outputs['gitleaks'])
+    # _run_docker_tool("Hadolint", "hadolint --format json /src/Dockerfile", scan_workspace, raw_outputs['hadolint'])
 
     # --- ARCHIVE: Parallel Execution (Uncomment if using Oracle Cloud 24GB RAM instance) ---
     threads = [

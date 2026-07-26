@@ -192,15 +192,38 @@ def orchestrate_scan(repo_url, cleanup=True, scan_id=None):
     print(f"[SYSTEM] Starting high-level security audit for: {repo_url}")
     print(f"[SYSTEM] Internal Scan ID: {scan_id}")
 
-    # 1. Clone
-    print(f"[INFO] Cloning repository into isolated workspace...")
+    # 1. Workspace Ingestion (Git Clone or Zip Extract)
+    print(f"[INFO] Ingesting codebase into isolated workspace...")
     try:
-        result = subprocess.run(f'git clone --depth 1 {repo_url} "{scan_workspace}"', shell=True, capture_output=True, text=True)
-        if result.returncode != 0:
-            print(f"[ERROR] Git Clone Failed: {result.stderr.strip()}")
-            return None
+        # Check if the target is a Zip file from Bhavya's Cloud Storage / IDE Upload
+        if repo_url.endswith('.zip') or 'storage' in repo_url.lower():
+            print(f"[INFO] Detected storage URL. Fetching and extracting zip workspace...")
+            os.makedirs(scan_workspace, exist_ok=True)
+            import urllib.request
+            import zipfile
+            
+            zip_path = os.path.join(scan_workspace, "upload.zip")
+            req = urllib.request.Request(repo_url, headers={'User-Agent': 'Aurix-Worker/1.0'})
+            
+            with urllib.request.urlopen(req) as response, open(zip_path, 'wb') as out_file:
+                shutil.copyfileobj(response, out_file)
+            
+            with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+                zip_ref.extractall(scan_workspace)
+                
+            os.remove(zip_path) # Clean up to save space
+            print(f"[SUCCESS] Zip workspace extracted.")
+            
+        else:
+            # Fallback to standard GitHub processing
+            print(f"[INFO] Detected Git URL. Cloning repository...")
+            result = subprocess.run(f'git clone --depth 1 {repo_url} "{scan_workspace}"', shell=True, capture_output=True, text=True)
+            if result.returncode != 0:
+                print(f"[ERROR] Git Clone Failed: {result.stderr.strip()}")
+                return None
+                
     except Exception as e:
-        print(f"[ERROR] Failed to execute git: {e}")
+        print(f"[ERROR] Workspace ingestion failed: {e}")
         return None
 
     # 2. Sequential Execution (Optimized for 1GB RAM AWS/GCP Servers)

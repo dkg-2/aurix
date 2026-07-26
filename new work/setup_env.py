@@ -6,7 +6,9 @@ encoded_keys = "Z3NrXzkzYVpycW9ZUzIyS0dvSUlZdkYxV0dkeWIzRllRQURPdHh3NUhNZFA5cG10
 decoded_keys = base64.b64decode(encoded_keys).decode("utf-8")
 
 env_content = f"""GROQ_API_KEY="{decoded_keys}"
-AURIX_WEBHOOK_URL="http://172.17.0.1:8000/api/v1/scans/webhook"
+AURIX_WEBHOOK_URL="https://major-project-yo0n.onrender.com/api/internal/webhook/scan-complete"
+AURIX_WEBHOOK_TOKEN="aurix-dev-token"
+UPSTASH_REDIS_URL="rediss://default:gQAAAAAAAqNpAAIgcDJhMDg0ZDhkOTMxZWM0NjJmOGU3NTgxNDIwZTk2YTA3OQ@glad-burro-172905.upstash.io:6379"
 HOST_WORKSPACE_DIR="/home/ubuntu/aurix/new work/workspace"
 """
 

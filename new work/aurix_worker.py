@@ -16,10 +16,10 @@ class AurixWorker:
         self.results_dir = "verified-results"
         os.makedirs(self.results_dir, exist_ok=True)
 
-    def run_full_audit(self, repo_url):
+    def run_full_audit(self, repo_url, scan_id=None):
         # 1. Run Phase 1: Raw Scanning
         print(f"\n[STEP 1] Running multi-layer scan engine for: {repo_url}")
-        raw_report = orchestrate_scan(repo_url, cleanup=False)
+        raw_report = orchestrate_scan(repo_url, cleanup=False, scan_id=scan_id)
         if not raw_report: return {"error": "Scan failed"}
 
         scan_id = raw_report['scan_id']
@@ -87,7 +87,8 @@ class AurixWorker:
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {webhook_token}"
             }
-            response = requests.post(webhook_url, json=final_report, headers=headers, timeout=10)
+            # Increased timeout to 90 seconds to account for Render free-tier Cold Starts
+            response = requests.post(webhook_url, json=final_report, headers=headers, timeout=90)
             if response.status_code == 200:
                 print("   [+] Webhook POST successful!")
             else:
@@ -127,7 +128,8 @@ class AurixWorker:
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("Usage: python aurix_worker.py <repo_url>")
+        print("Usage: python aurix_worker.py <repo_url> [scan_id]")
     else:
         worker = AurixWorker()
-        worker.run_full_audit(sys.argv[1])
+        scan_id = sys.argv[2] if len(sys.argv) > 2 else None
+        worker.run_full_audit(sys.argv[1], scan_id=scan_id)

@@ -172,7 +172,7 @@ def _remove_readonly(func, path, excinfo):
 
 # --- PUBLIC INTERFACE ---
 
-def orchestrate_scan(repo_url, cleanup=True):
+def orchestrate_scan(repo_url, cleanup=True, scan_id=None):
     """
     Primary entry point for the Security Engine.
     Performs Cloning -> Parallel Scanning -> Normalization -> Cleanup.
@@ -185,7 +185,7 @@ def orchestrate_scan(repo_url, cleanup=True):
         print("[ERROR] Docker daemon is unreachable. Scan aborted.")
         return None
 
-    scan_id = str(uuid.uuid4())
+    scan_id = scan_id or str(uuid.uuid4())
     project_name = repo_url.split("/")[-1].replace(".git", "")
     scan_workspace = os.path.abspath(os.path.join(WORKSPACE_DIR, f"{project_name}_{scan_id}"))
     

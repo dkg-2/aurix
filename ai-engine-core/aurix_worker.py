@@ -95,23 +95,32 @@ class AurixWorker:
             ctx = fetcher.get_finding_context(f['file'], f['line'])
             findings_with_context.append((f, ctx))
 
-        # --- THE HYPER-BATCH: Single API call to triage ALL findings ---
+        # --- CHUNKED HYPER-BATCH: Process in groups of 15 to avoid token overflow ---
+        CHUNK_SIZE = 15
         exploitable_findings = []
         if findings_with_context:
             client = AurixGroqClient()
-            batch_prompt = format_hyper_batch_prompt(findings_with_context)
-            full_prompt = f"{SYSTEM_PROMPT_LOGIC_HYPER_BATCH}\n\n{batch_prompt}"
-            
-            print(f"    [TRIAGE] Sending {len(findings_with_context)} findings in ONE API call...")
-            triage_response = client.call_logic_agent(full_prompt)
-            triage_results = triage_response.get("results", [])
-
-            # Build a lookup map from the triage response
+            total_chunks = (len(findings_with_context) + CHUNK_SIZE - 1) // CHUNK_SIZE
             triage_map = {}
-            for r in triage_results:
-                fid = r.get("finding_id")
-                if fid:
-                    triage_map[fid] = r
+
+            for chunk_idx in range(total_chunks):
+                start = chunk_idx * CHUNK_SIZE
+                end = min(start + CHUNK_SIZE, len(findings_with_context))
+                chunk = findings_with_context[start:end]
+
+                print(f"    [TRIAGE] Chunk {chunk_idx + 1}/{total_chunks}: Sending {len(chunk)} findings...")
+                _post_progress(scan_id, "ANALYZING", f"AI Triage: Chunk {chunk_idx + 1}/{total_chunks} ({start + 1}-{end} of {len(findings_with_context)})...", 40 + int(15 * (chunk_idx / total_chunks)))
+
+                batch_prompt = format_hyper_batch_prompt(chunk)
+                full_prompt = f"{SYSTEM_PROMPT_LOGIC_HYPER_BATCH}\n\n{batch_prompt}"
+
+                triage_response = client.call_logic_agent(full_prompt)
+                triage_results = triage_response.get("results", [])
+
+                for r in triage_results:
+                    fid = r.get("finding_id")
+                    if fid:
+                        triage_map[fid] = r
 
             # Filter: only keep findings the AI marked as exploitable with high confidence
             for f, ctx in findings_with_context:

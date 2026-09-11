@@ -1,0 +1,83 @@
+{
+  "name": "aurix-security",
+  "displayName": "AURIX Security Scanner",
+  "description": "Agentic Security Remediation Platform - Instantly scan and patch your code using AI.",
+  "version": "1.9.0",
+  "publisher": "aurix-team",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dkg-2/aurix"
+  },
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": [
+    "Security",
+    "Linters"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "aurix-sidebar",
+          "title": "AURIX Security",
+          "icon": "$(shield)"
+        }
+      ]
+    },
+    "views": {
+      "aurix-sidebar": [
+        {
+          "id": "aurix-actions",
+          "name": "Quick Actions"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "aurix.login",
+        "title": "AURIX: Login"
+      },
+      {
+        "command": "aurix.scanWorkspace",
+        "title": "AURIX: Scan Workspace"
+      },
+      {
+        "command": "aurix.mockScan",
+        "title": "AURIX: Run Mock Scan (Offline)"
+      }
+    ],
+    "configuration": {
+      "title": "AURIX",
+      "properties": {
+        "aurix.apiEndpoint": {
+          "type": "string",
+          "default": "https://major-project-yo0n.onrender.com",
+          "description": "The URL of the AURIX backend API."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint"
+  },
+  "devDependencies": {
+    "@types/archiver": "^8.0.0",
+    "@types/node": "18.x",
+    "@types/vscode": "^1.75.0",
+    "typescript": "^5.1.3"
+  },
+  "dependencies": {
+    "archiver": "^6.0.1",
+    "axios": "^1.5.0",
+    "form-data": "^4.0.0",
+    "ignore": "^5.2.4"
+  }
+}

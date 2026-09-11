@@ -1,0 +1,18 @@
+# Virtual Environment
+fyp-venv/
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+# Workspaces and Temporary Clones
+workspace/
+test-subject/
+test-subject-goof/
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# Sensitive local config (if any)
+.env

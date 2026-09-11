@@ -1,0 +1,80 @@
+flowchart TD
+    %% Styling Configuration
+    classDef ui fill:#e3f2fd,stroke:#1565c0,stroke-width:2px;
+    classDef api fill:#f3e5f5,stroke:#8e24aa,stroke-width:2px;
+    classDef db fill:#fff3e0,stroke:#e65100,stroke-width:2px;
+    classDef engine fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px;
+    classDef agent fill:#fff8e1,stroke:#fbc02d,stroke-width:2px;
+    classDef docker fill:#ffebee,stroke:#c62828,stroke-width:2px;
+    classDef storage fill:#e0f7fa,stroke:#006064,stroke-width:2px;
+
+    %% 1. Client Layer
+    subgraph Client_Layer ["1. Client Interfaces"]
+        WebUI["Web Dashboard<br>(Provides GitHub URL)"]:::ui
+        VSCode["VS Code Extension<br>(Zips Local Code Folder)"]:::ui
+    end
+
+    %% 2. Backend API & Storage Layer (Traffic Cop)
+    subgraph Backend_Layer ["2. Backend API & Storage Gateway"]
+        API["Backend API Server<br>(FastAPI / Node.js)"]:::api
+        DB[("Primary DB<br>Users/Reports")]:::db
+        S3[("Cloud Storage / S3<br>Ephemeral Zips")]:::storage
+        Redis[("Task Queue<br>Redis / RabbitMQ")]:::db
+        
+        WebUI -->|"1a. POST GitHub URL"| API
+        VSCode -->|"1b. POST Zipped Code"| API
+        API <-->|"Stores metadata"| DB
+        API -->|"2b. Saves Zip payload"| S3
+        API -->|"3. Pushes Scan Job"| Redis
+    end
+
+    %% 3. Dedicated Worker Node (The Muscle)
+    subgraph Worker_Node ["3. Dedicated Worker Node"]
+        Worker["Task Worker Daemon<br>(Celery / RQ)"]:::engine
+        CodeManager["Code Fetcher<br>(Git Clone OR Unzip S3)"]:::engine
+        Scanner["Scan Engine<br>(Opengrep, Trivy, Hadolint)"]:::engine
+        Triage["Triage Node<br>(Filters INFO/LOW, Groups by File)"]:::engine
+        
+        Redis -->|"4. Pulls Job"| Worker
+        Worker -->|"5. Retrieves Target"| CodeManager
+        S3 -.->|"Downloads Zip"| CodeManager
+        CodeManager -->|"6. Raw Code Folder"| Scanner
+        Scanner -->|"7. Raw JSON Output"| Triage
+    end
+
+    %% 4. Agentic Orchestrator Layer (Runs on Worker Node)
+    subgraph Agent_Layer ["4. LangGraph Agentic Orchestrator"]
+        State[("AurixState: Shared Memory")]:::db
+        Context["Context Fetcher<br>(Pulls surrounding 50 lines)"]:::engine
+        LogicAgent["Logic Agent<br>(Evaluates Context + JSON)"]:::agent
+        Consensus{"Consensus Gate"}
+        RedAgent["Red Agent<br>(Generates Exploit PoC)"]:::agent
+        BlueAgent["Blue Agent<br>(Generates Code Patch)"]:::agent
+
+        Triage -->|"8. Pushes Target Queue"| State
+        State --> Context
+        Context -->|"9. Feeds exact code snippet"| LogicAgent
+        LogicAgent -->|"10. Confidence Score"| Consensus
+        Consensus -->|"11. If > 80% Exploitable"| RedAgent
+        Consensus -->|"11. If > 80% Exploitable"| BlueAgent
+        Consensus -->|"11. If False Positive"| State
+    end
+
+    %% 5. Sandbox Layer
+    subgraph Sandbox_Layer ["5. Isolated Execution"]
+        Docker(("Docker Execution Sandbox")):::docker
+        
+        RedAgent -->|"12. Runs Python/Bash PoC"| Docker
+        BlueAgent -->|"12. Applies Patch"| Docker
+    end
+
+    %% 6. Output & Feedback Loop
+    subgraph Output_Layer ["6. Verified Output"]
+        Result{"Did Patch Stop PoC?"}
+        Report["Final Verified Report & Patch"]:::api
+        
+        Docker --> Result
+        Result -->|"13. Yes (Success)"| Report
+        Result -.->|"13. No (Failed)"| State
+        Report -->|"14. Webhook / Update Status"| API
+    end

@@ -1,0 +1,11 @@
+{
+  "scan_id": "99b82e9e-2969-4c25-b688-0e84f5b13c42",
+  "url": "https://github.com/OWASP/NodeGoat",
+  "timestamp": "2026-07-20T01:06:31.227593",
+  "summary": {
+    "total_findings": 0,
+    "neutralized_count": 0,
+    "scan_engine": "Project AURIX LangGraph v1"
+  },
+  "findings": []
+}

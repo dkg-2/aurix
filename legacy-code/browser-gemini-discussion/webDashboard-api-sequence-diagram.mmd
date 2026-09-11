@@ -1,0 +1,52 @@
+%%{init: {
+  "theme": "default",
+  "themeVariables": {
+    "background": "#ffffff",
+    "primaryColor": "#ffffff",
+    "primaryTextColor": "#000000",
+    "lineColor": "#000000",
+    "secondaryColor": "#f4f4f4",
+    "tertiaryColor": "#ffffff"
+  }
+}}%%
+
+sequenceDiagram
+    autonumber
+
+    actor User as User (Browser)
+    participant Web as Web Dashboard (React)
+    participant API as Backend API (Render)
+    participant DB as Supabase (DB)
+    participant Q as Redis Queue (Upstash)
+    participant Worker as Worker Node (Local/Cloud)
+    participant Git as GitHub
+
+    User->>Web: Pastes GitHub URL and clicks Scan
+
+    Note over Web,API: POST /api/scans/github
+    Web->>API: Sends github_url payload
+
+    API->>DB: Creates Scan Record Status PENDING
+    API->>Q: Pushes Job Ticket to Queue Includes URL
+    API-->>Web: Returns 202 Accepted plus scan_id
+
+    loop Every 5 Seconds
+        Note over Web,API: GET /api/scans/{scan_id}
+        Web->>API: Check scan status
+        API-->>Web: Status SCANNING
+    end
+
+    Q->>Worker: Pulls Job Ticket
+
+    Note right of Worker: The difference happens here
+    Worker->>Git: Executes git clone github_url
+    Git-->>Worker: Downloads source code directly to Worker
+
+    Note right of Worker: Runs Scan Engine and LangGraph Agents
+
+    Worker->>API: Webhook POST Final Verified Bugs
+    API->>DB: Updates Status to COMPLETED and Saves Data
+
+    Web->>API: Check scan status
+    API-->>Web: Status COMPLETED with Bug List Payload
+    Web->>User: Renders Vulnerability Dashboard

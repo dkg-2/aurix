@@ -1,0 +1,71 @@
+%%{init: {
+  "theme": "default",
+  "themeVariables": {
+    "background": "#ffffff",
+    "primaryTextColor": "#000000",
+    "lineColor": "#000000"
+  }
+}}%%
+
+flowchart TD
+    %% Styling
+    classDef state_obj fill:#fff3e0,stroke:#e65100,stroke-width:2px,stroke-dasharray: 5 5;
+    classDef python fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px;
+    classDef llm fill:#e3f2fd,stroke:#1565c0,stroke-width:2px;
+    classDef docker fill:#ffebee,stroke:#c62828,stroke-width:2px;
+    classDef decision fill:#f3e5f5,stroke:#8e24aa,stroke-width:2px;
+
+    %% Entry
+    Start([Start Orchestrator]) --> CheckQueue
+
+    %% The Queue Loop
+    subgraph The_Loop ["The Vulnerability Queue Loop"]
+        CheckQueue{"Are there items in<br>target_vulnerabilities?"}:::decision
+        
+        %% Pop an item
+        PopItem["Node: Pop Next Vulnerability<br>(Sets current_vuln)"]:::python
+        CheckQueue -->|Yes| PopItem
+        
+        %% Fetch Context
+        FetchContext["Node: Context Fetcher<br>(Reads file & lines, sets analysis_context)"]:::python
+        PopItem --> FetchContext
+        
+        %% Logic Agent
+        LogicAgent["Node: Logic Agent (LLM)<br>(Reads Context + JSON)"]:::llm
+        FetchContext --> LogicAgent
+        
+        %% Consensus Gate
+        Consensus{"Is Confidence<br>>> 0.80?"}:::decision
+        LogicAgent -->|"Outputs is_exploitable and score"| Consensus
+        
+        %% False Positive Path
+        Consensus -->|"No (False Positive)"| ClearState["Node: Clear Current State<br>(Drops finding)"]:::python
+        ClearState --> CheckQueue
+        
+        %% True Positive Path
+        RedAgent["Node: Red Agent (LLM)<br>(Writes poc_script)"]:::llm
+        BlueAgent["Node: Blue Agent (LLM)<br>(Writes patch_code)"]:::llm
+        
+        Consensus -->|"Yes (Exploitable)"| RedAgent
+        Consensus -->|"Yes (Exploitable)"| BlueAgent
+        
+        %% Wargaming
+        Sandbox["Node: Docker Sandbox<br>(Executes PoC and Patch)"]:::docker
+        RedAgent --> Sandbox
+        BlueAgent --> Sandbox
+        
+        %% Sandbox Evaluation
+        Verify{"Did Patch Stop PoC?"}:::decision
+        Sandbox -->|"Outputs wargame_status"| Verify
+        
+        %% Failed Sandbox
+        Verify -->|"No (Exploit Failed or Patch Failed)"| ClearState
+        
+        %% Successful Sandbox
+        SaveResult["Node: Append to Verified Reports<br>(Saves to final payload)"]:::python
+        Verify -->|"Yes (Verified!)"| SaveResult
+        SaveResult --> ClearState
+    end
+
+    %% Exit
+    CheckQueue -->|"No (Queue Empty)"| Finish([End Graph and Return Payload])

@@ -1,0 +1,10 @@
+langchain
+langgraph
+langchain-groq
+langchain-openai
+requests
+docker
+python-dotenv
+groq
+psutil
+redis

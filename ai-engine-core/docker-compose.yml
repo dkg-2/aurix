@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  aurix-engine:
+    build:
+      context: .
+      dockerfile: Dockerfile.engine
+    container_name: aurix_ai_worker
+    restart: unless-stopped
+    # Mount the docker socket so the Engine can spawn Sandbox containers
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./verified-results:/app/verified-results
+      - ./pending-sync:/app/pending-sync
+      # Map the host workspace directly so the daemon can access the clones
+      - ./workspace:/app/workspace
+    env_file:
+      - .env
+    environment:
+      - MAX_WORKERS=3
+      - MAX_MEMORY_PERCENT=85
+      - MAX_CPU_PERCENT=90
+    # Resource limits to protect the AWS instance from OOM kills
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '2.0'
+        reservations:
+          memory: 512M
+          cpus: '0.5'
+
+    # We override the command so the container stays alive in the background
+    # allowing you to `docker exec` into it and run scans manually for now.
+    entrypoint: [ "tail", "-f", "/dev/null" ]

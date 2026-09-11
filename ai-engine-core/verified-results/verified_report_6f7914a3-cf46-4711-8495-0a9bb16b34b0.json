@@ -1,0 +1,11 @@
+{
+  "scan_id": "6f7914a3-cf46-4711-8495-0a9bb16b34b0",
+  "url": "https://github.com/octocat/Hello-World",
+  "timestamp": "2026-07-26T18:18:23.032927",
+  "summary": {
+    "total_findings": 0,
+    "neutralized_count": 0,
+    "scan_engine": "Project AURIX LangGraph v1"
+  },
+  "findings": []
+}

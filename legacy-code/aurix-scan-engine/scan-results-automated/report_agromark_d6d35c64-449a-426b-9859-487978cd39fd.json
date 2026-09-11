@@ -1,0 +1,103 @@
+{
+  "scan_id": "d6d35c64-449a-426b-9859-487978cd39fd",
+  "timestamp": "2026-03-15T16:46:54.232287+00:00",
+  "total_findings": 6,
+  "findings": [
+    {
+      "id": "CVE-2025-55182",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "next: React Server Components: Pre-authentication remote code execution via unsafe deserialization",
+      "description": "A pre-authentication remote code execution vulnerability exists in React Server Components versions 19.0.0, 19.1.0, 19.1.1, and 19.2.0 including the following packages: react-server-dom-parcel, react-server-dom-turbopack, and react-server-dom-webpack. The vulnerable code unsafely deserializes payloads from HTTP requests to Server Function endpoints.",
+      "severity": "CRITICAL",
+      "cvss": 9.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "next",
+      "fix": "Update to 15.0.5, 15.1.9, 15.2.6, 15.3.6, 15.4.8, 15.5.7, 16.0.7",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2025-55182"
+      ]
+    },
+    {
+      "id": "GHSA-h25m-26qc-wcjf",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "Next.js HTTP request deserialization can lead to DoS when using insecure React Server Components",
+      "description": "A vulnerability affects certain React Server Components packages for versions 19.0.x, 19.1.x, and 19.2.x and frameworks that use the affected packages, including Next.js 13.x, 14.x, 15.x, and 16.x using the App Router. The issue is tracked upstream as [CVE-2026-23864](https://github.com/facebook/react/security/advisories/GHSA-83fc-fqcc-2hmg).\n\nA specially crafted HTTP request can be sent to any App Router Server Function endpoint that, when deserialized, may trigger excessive CPU usage, out-of-memory exceptions, or server crashes. This can result in denial of service in unpatched environments.",
+      "severity": "HIGH",
+      "cvss": 8.0,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "next",
+      "fix": "Update to 15.0.8, 15.1.12, 15.2.9, 15.3.9, 15.4.11, 15.5.10, 15.6.0-canary.61, 16.0.11, 16.1.5",
+      "references": [
+        "https://github.com/advisories/GHSA-h25m-26qc-wcjf"
+      ]
+    },
+    {
+      "id": "GHSA-mwv6-3258-q52c",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "Next Vulnerable to Denial of Service with Server Components",
+      "description": "A vulnerability affects certain React packages for versions 19.0.0, 19.0.1, 19.1.0, 19.1.1, 19.1.2, 19.2.0, and 19.2.1 and frameworks that use the affected packages, including Next.js 15.x and 16.x using the App Router. The issue is tracked upstream as [CVE-2025-55184](https://www.cve.org/CVERecord?id=CVE-2025-55184).\n\nA malicious HTTP request can be crafted and sent to any App Router endpoint that, when deserialized, can cause the server process to hang and consume CPU. This can result in denial of service in unpatched environments.",
+      "severity": "HIGH",
+      "cvss": 8.0,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "next",
+      "fix": "Update to 14.2.34, 15.0.6, 15.1.10, 15.2.7, 15.3.7, 15.4.9, 15.5.8, 15.6.0-canary.59, 16.0.9, 16.1.0-canary.17",
+      "references": [
+        "https://github.com/advisories/GHSA-mwv6-3258-q52c"
+      ]
+    },
+    {
+      "id": "CVE-2025-59471",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "next: NextJS Denial of Service in Image Optimizer",
+      "description": "A denial of service vulnerability exists in self-hosted Next.js applications that have `remotePatterns` configured for the Image Optimizer. The image optimization endpoint (`/_next/image`) loads external images entirely into memory without enforcing a maximum size limit, allowing an attacker to cause out-of-memory conditions by requesting optimization of arbitrarily large images. This vulnerability requires that `remotePatterns` is configured to allow image optimization from external domains and that the attacker can serve or control a large image on an allowed domain.\r\n\r\nStrongly consider upgrading to 15.5.10 or 16.1.5 to reduce risk and prevent availability issues in Next applications.",
+      "severity": "MEDIUM",
+      "cvss": 7.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "next",
+      "fix": "Update to 15.5.10, 16.1.5",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2025-59471"
+      ]
+    },
+    {
+      "id": "CVE-2025-59472",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "next: NextJS Denial of Service in Partial Pre Rendering",
+      "description": "A denial of service vulnerability exists in Next.js versions with Partial Prerendering (PPR) enabled when running in minimal mode. The PPR resume endpoint accepts unauthenticated POST requests with the `Next-Resume: 1` header and processes attacker-controlled postponed state data. Two closely related vulnerabilities allow an attacker to crash the server process through memory exhaustion:\n\n1. **Unbounded request body buffering**: The server buffers the entire POST request body into memory using `Buffer.concat()` without enforcing any size limit, allowing arbitrarily large payloads to exhaust available memory.\n\n2. **Unbounded decompression (zipbomb)**: The resume data cache is decompressed using `inflateSync()` without limiting the decompressed output size. A small compressed payload can expand to hundreds of megabytes or gigabytes, causing memory exhaustion.\n\nBoth attack vectors result in a fatal V8 out-of-memory error (`FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory`) causing the Node.js process to terminate. The zipbomb variant is particularly dangerous as it can bypass reverse proxy request size limits while still causing large memory allocation on the server.\n\nTo be affected you must have an application running with `experimental.ppr: true` or `cacheComponents: true` configured along with the NEXT_PRIVATE_MINIMAL_MODE=1 environment variable.\n\nStrongly consider upgrading to 15.6.0-canary.61 or 16.1.5 to reduce risk and prevent availability issues in Next applications.",
+      "severity": "MEDIUM",
+      "cvss": 7.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "next",
+      "fix": "Update to 16.1.5, 15.6.0-canary.61",
+      "references": [
+        "https://avd.aquasec.com/nvd/cve-2025-59472"
+      ]
+    },
+    {
+      "id": "GHSA-w37m-7fhw-fmv9",
+      "tool": "trivy",
+      "category": "sca",
+      "title": "Next Server Actions Source Code Exposure ",
+      "description": "A vulnerability affects certain React packages for versions 19.0.0, 19.0.1, 19.1.0, 19.1.1, 19.1.2, 19.2.0, and 19.2.1 and frameworks that use the affected packages, including Next.js 15.x and 16.x using the App Router. The issue is tracked upstream as [CVE-2025-55183](https://www.cve.org/CVERecord?id=CVE-2025-55183).\n\nA malicious HTTP request can be crafted and sent to any App Router endpoint that can return the compiled source code of [Server Functions](https://react.dev/reference/rsc/server-functions). This could reveal business logic, but would not expose secrets unless they were hardcoded directly into [Server Function](https://react.dev/reference/rsc/server-functions) code.",
+      "severity": "MEDIUM",
+      "cvss": 5.5,
+      "file": "package-lock.json",
+      "line": 0,
+      "evidence": "next",
+      "fix": "Update to 15.0.6, 15.1.10, 15.2.7, 15.3.7, 15.4.9, 15.5.8, 15.6.0-canary.59, 16.0.9, 16.1.0-canary.17",
+      "references": [
+        "https://github.com/advisories/GHSA-w37m-7fhw-fmv9"
+      ]
+    }
+  ]
+}

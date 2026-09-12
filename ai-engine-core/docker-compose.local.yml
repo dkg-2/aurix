@@ -1,0 +1,19 @@
+services:
+  aurix-engine:
+    build:
+      context: .
+      dockerfile: Dockerfile.engine
+    container_name: aurix_ai_worker
+    volumes:
+      # Windows Docker Desktop: use named pipe instead of /var/run/docker.sock
+      - //var/run/docker.sock:/var/run/docker.sock
+      - ./verified-results:/app/verified-results
+      - ./pending-sync:/app/pending-sync
+      - ./workspace:/app/workspace
+    env_file:
+      - .env
+    environment:
+      - PYTHONUNBUFFERED=1
+
+    # Keep the container alive so we can docker exec into it
+    entrypoint: [ "tail", "-f", "/dev/null" ]

@@ -1,251 +1,276 @@
+"""
+AURIX Worker Pipeline v2 — Clean 5-Phase Audit Engine.
+
+Phase 1: Static Scanning (Opengrep, Trivy, Gitleaks, Hadolint)
+Phase 2: Smart Triage (Token-aware adaptive batching)
+Phase 3: Deep Analysis (LangGraph Red/Blue/Sandbox)
+Phase 4: Report Generation & Webhook Delivery
+Phase 5: Workspace Cleanup
+"""
+
 import os
-import json
 import sys
-import requests
+import json
+import shutil
+import stat
 import time
+import traceback
 from datetime import datetime
 
-# Import local components
+import requests
+from dotenv import load_dotenv
+
+load_dotenv()
+
 from engine import orchestrate_scan
 from aurix_graph import aurix_engine
 from context_fetcher import ContextFetcher
-from groq_client import AurixGroqClient
-from logic_agent import SYSTEM_PROMPT_LOGIC_HYPER_BATCH, format_hyper_batch_prompt
+from groq_client import call_triage
+from logic_agent import SYSTEM_PROMPT_TRIAGE, format_batch_prompt, create_adaptive_chunks
 
-# --- WEBHOOK HELPERS ---
+# ═══════════════════════════════════════════════
+# CONFIGURATION
+# ═══════════════════════════════════════════════
 
-WEBHOOK_COMPLETE_URL = os.getenv("AURIX_WEBHOOK_URL", "http://localhost:8000/api/internal/webhook/scan-complete")
-WEBHOOK_PROGRESS_URL = os.getenv("AURIX_PROGRESS_WEBHOOK_URL", "http://localhost:8000/api/internal/webhook/scan-progress")
+WEBHOOK_COMPLETE_URL = os.getenv("AURIX_WEBHOOK_URL")
+WEBHOOK_PROGRESS_URL = os.getenv("AURIX_PROGRESS_WEBHOOK_URL")
 WEBHOOK_TOKEN = os.getenv("AURIX_WEBHOOK_TOKEN", "aurix-dev-token")
+RESULTS_DIR = "verified-results"
+DLQ_DIR = "pending-sync"
+
+
+# ═══════════════════════════════════════════════
+# HELPERS
+# ═══════════════════════════════════════════════
 
 def _post_progress(scan_id, status, message="", progress_pct=0):
-    """Sends a real-time status update to Bhavya's backend so the DB moves from PENDING."""
+    """Sends a real-time status update to the backend. Non-critical — never crashes the scan."""
+    if not WEBHOOK_PROGRESS_URL:
+        return
     try:
-        payload = {
-            "scan_id": scan_id,
-            "status": status,
-            "message": message,
-            "progress": progress_pct,
+        requests.post(WEBHOOK_PROGRESS_URL, json={
+            "scan_id": scan_id, "status": status,
+            "message": message, "progress": progress_pct,
             "timestamp": datetime.now().isoformat()
-        }
-        headers = {
+        }, headers={
             "Content-Type": "application/json",
             "Authorization": f"Bearer {WEBHOOK_TOKEN}"
-        }
-        response = requests.post(WEBHOOK_PROGRESS_URL, json=payload, headers=headers, timeout=15)
-        if response.status_code == 200:
-            print(f"    [PROGRESS] Sent: {status} ({progress_pct}%) → {message}")
-        else:
-            print(f"    [PROGRESS] Warning: Backend returned {response.status_code}")
-    except Exception as e:
-        # Progress updates are non-critical — never crash the scan over them
-        print(f"    [PROGRESS] Failed to send (non-fatal): {e}")
+        }, timeout=10)
+        print(f"    [PROGRESS] {status} ({progress_pct}%) — {message}")
+    except Exception:
+        pass
 
+
+def _save_dead_letter(report, scan_id):
+    """Saves failed webhook payloads for manual retry later."""
+    os.makedirs(DLQ_DIR, exist_ok=True)
+    path = os.path.join(DLQ_DIR, f"failed_sync_{scan_id}.json")
+    with open(path, "w") as f:
+        json.dump(report, f, indent=2)
+    print(f"    [DLQ] Saved to {path}")
+
+
+def _remove_readonly(func, path, _):
+    """Handler for shutil.rmtree to remove read-only files (git locks on Windows)."""
+    os.chmod(path, stat.S_IWRITE)
+    func(path)
+
+
+# ═══════════════════════════════════════════════
+# MAIN WORKER CLASS
+# ═══════════════════════════════════════════════
 
 class AurixWorker:
-    """
-    Master Worker that triggers the LangGraph Engine.
-    Now with Progress Webhooks and Hyper-Batch Triage.
-    """
+
     def __init__(self):
-        self.results_dir = "verified-results"
-        os.makedirs(self.results_dir, exist_ok=True)
+        os.makedirs(RESULTS_DIR, exist_ok=True)
 
     def run_full_audit(self, repo_url, scan_id=None):
         start_time = time.time()
 
-        # =====================================================
-        # STEP 1: Raw Multi-Tool Scanning
-        # =====================================================
-        print(f"\n[STEP 1] Running multi-layer scan engine for: {repo_url}")
-        _post_progress(scan_id, "SCANNING", "Cloning repository and running static analyzers...", 10)
+        try:
+            # ─────────────────────────────────────────
+            # PHASE 1: Static Scanning
+            # ─────────────────────────────────────────
+            print(f"\n[PHASE 1] Static scanning: {repo_url}")
+            _post_progress(scan_id, "SCANNING", "Cloning repository and running static analyzers...", 10)
 
-        raw_report = orchestrate_scan(repo_url, cleanup=False, scan_id=scan_id)
-        if not raw_report:
-            _post_progress(scan_id, "FAILED", "Static scan engine failed to produce results.", 0)
-            return {"error": "Scan failed"}
+            raw_report = orchestrate_scan(repo_url, cleanup=False, scan_id=scan_id)
+            if not raw_report:
+                _post_progress(scan_id, "FAILED", "Static scan engine returned no results.", 0)
+                return {"error": "Scan failed"}
 
-        scan_id = raw_report['scan_id']
-        workspace_path = raw_report['workspace_path']
-        all_findings = raw_report['findings']
+            scan_id = raw_report['scan_id']
+            workspace_path = raw_report['workspace_path']
+            all_findings = raw_report['findings']
 
-        _post_progress(scan_id, "SCANNING", f"Static scan complete. Found {len(all_findings)} raw findings.", 30)
+            print(f"[PHASE 1] Found {len(all_findings)} raw findings.")
+            _post_progress(scan_id, "SCANNING", f"Static scan complete. {len(all_findings)} raw findings.", 30)
 
-        # =====================================================
-        # STEP 2: HYPER-BATCH TRIAGE (Single API Call!)
-        # =====================================================
-        sast_findings = [f for f in all_findings if f['category'] == "sast"]
-        
-        # Deduplicate per-line to save tokens
-        seen_sigs = set()
-        representative_findings = []
-        for f in sast_findings:
-            sig = f"{f['file']}:{f['line']}:{f['title']}"
-            if sig not in seen_sigs:
-                representative_findings.append(f)
-                seen_sigs.add(sig)
+            # ─────────────────────────────────────────
+            # PHASE 2: Smart Triage (Adaptive Batching)
+            # ─────────────────────────────────────────
+            sast_findings = [f for f in all_findings if f.get('category') == 'sast']
 
-        print(f"[STEP 2] Hyper-Batch Triage: {len(representative_findings)} unique SAST findings to analyze...")
-        _post_progress(scan_id, "ANALYZING", f"AI Triage: Analyzing {len(representative_findings)} code findings in a single batch...", 40)
+            # Deduplicate by file:line:title
+            seen = set()
+            unique_findings = []
+            for f in sast_findings:
+                sig = f"{f.get('file')}:{f.get('line')}:{f.get('title')}"
+                if sig not in seen:
+                    unique_findings.append(f)
+                    seen.add(sig)
 
-        # Fetch context for ALL findings at once
-        fetcher = ContextFetcher(workspace_path)
-        findings_with_context = []
-        for f in representative_findings:
-            ctx = fetcher.get_finding_context(f['file'], f['line'])
-            findings_with_context.append((f, ctx))
+            print(f"[PHASE 2] Triage: {len(unique_findings)} unique SAST findings")
+            _post_progress(scan_id, "ANALYZING", f"Triaging {len(unique_findings)} findings...", 35)
 
-        # --- CHUNKED HYPER-BATCH: Process in groups of 5 to stay under Groq's 8K TPM limit ---
-        CHUNK_SIZE = 5
-        exploitable_findings = []
-        if findings_with_context:
-            client = AurixGroqClient()
-            total_chunks = (len(findings_with_context) + CHUNK_SIZE - 1) // CHUNK_SIZE
+            # Fetch code context for all findings
+            fetcher = ContextFetcher(workspace_path)
+            findings_with_context = []
+            for f in unique_findings:
+                ctx = fetcher.get_finding_context(f.get('file', ''), f.get('line', 0))
+                findings_with_context.append((f, ctx))
+
+            # Create token-aware adaptive chunks
+            chunks = create_adaptive_chunks(findings_with_context, max_tokens=5500)
+            print(f"    [TRIAGE] Split into {len(chunks)} adaptive chunks")
+
+            # Process each chunk through the triage AI
             triage_map = {}
+            for i, chunk in enumerate(chunks):
+                print(f"    [TRIAGE] Chunk {i+1}/{len(chunks)}: {len(chunk)} findings")
+                _post_progress(scan_id, "ANALYZING",
+                    f"Triage chunk {i+1}/{len(chunks)}...",
+                    35 + int(20 * (i / max(len(chunks), 1))))
 
-            for chunk_idx in range(total_chunks):
-                start = chunk_idx * CHUNK_SIZE
-                end = min(start + CHUNK_SIZE, len(findings_with_context))
-                chunk = findings_with_context[start:end]
-
-                print(f"    [TRIAGE] Chunk {chunk_idx + 1}/{total_chunks}: Sending {len(chunk)} findings...")
-                _post_progress(scan_id, "ANALYZING", f"AI Triage: Chunk {chunk_idx + 1}/{total_chunks} ({start + 1}-{end} of {len(findings_with_context)})...", 40 + int(15 * (chunk_idx / total_chunks)))
-
-                batch_prompt = format_hyper_batch_prompt(chunk)
-                full_prompt = f"{SYSTEM_PROMPT_LOGIC_HYPER_BATCH}\n\n{batch_prompt}"
-
-                triage_response = client.call_logic_agent(full_prompt)
-                triage_results = triage_response.get("results", [])
-
-                for r in triage_results:
+                prompt = f"{SYSTEM_PROMPT_TRIAGE}\n\n{format_batch_prompt(chunk)}"
+                response = call_triage(prompt)
+                
+                for r in response.get("results", []):
                     fid = r.get("finding_id")
                     if fid:
                         triage_map[fid] = r
 
-            # Filter: only keep findings the AI marked as exploitable with high confidence
+            # Filter: keep only confirmed exploitable findings
+            exploitable_findings = []
             for f, ctx in findings_with_context:
                 triage = triage_map.get(f.get('id')) or triage_map.get(f.get('rule_id'))
-                if triage and triage.get("is_exploitable") and triage.get("confidence", 0) >= 0.8:
+                if triage and triage.get("is_exploitable") and triage.get("confidence", 0) >= 0.7:
                     f['_triage_reasoning'] = triage.get("reasoning", "")
                     f['_context'] = ctx
                     exploitable_findings.append(f)
-                else:
-                    reason = "Not found in triage" if not triage else f"Confidence: {triage.get('confidence', 0)}"
-                    print(f"    [DROPPED] {f.get('title', 'Unknown')} — {reason}")
 
-            print(f"    [TRIAGE] Result: {len(exploitable_findings)} exploitable / {len(representative_findings)} total")
-        
-        _post_progress(scan_id, "ANALYZING", f"Triage complete. {len(exploitable_findings)} confirmed exploitable. Starting Red/Blue agents...", 55)
+            dropped = len(unique_findings) - len(exploitable_findings)
+            print(f"    [TRIAGE] Result: {len(exploitable_findings)} exploitable, {dropped} dropped")
+            _post_progress(scan_id, "ANALYZING",
+                f"Triage done. {len(exploitable_findings)} exploitable findings.", 55)
 
-        # =====================================================
-        # STEP 3: Run LangGraph ONLY on confirmed exploitable findings
-        # =====================================================
-        if exploitable_findings:
-            print(f"[STEP 3] Launching LangGraph for {len(exploitable_findings)} confirmed vulnerabilities...")
-
-            initial_state = {
-                "workspace_path": workspace_path,
-                "target_vulnerabilities": exploitable_findings,
-                "current_vuln": None,
-                "verified_reports": [],
-                "retries": 0
-            }
-
-            _post_progress(scan_id, "ANALYZING", "Red Agent attacking, Blue Agent patching, Sandbox verifying...", 65)
-            final_state = aurix_engine.invoke(initial_state)
-            verified_data = {f['id']: f for f in final_state['verified_reports']}
-        else:
-            print(f"[STEP 3] No exploitable findings — skipping LangGraph entirely.")
+            # ─────────────────────────────────────────
+            # PHASE 3: Deep Analysis (LangGraph)
+            # ─────────────────────────────────────────
             verified_data = {}
+            if exploitable_findings:
+                print(f"[PHASE 3] LangGraph: Analyzing {len(exploitable_findings)} vulnerabilities...")
+                _post_progress(scan_id, "ANALYZING", "Red Agent attacking, Blue Agent patching...", 60)
 
-        _post_progress(scan_id, "ANALYZING", "Consolidating final report...", 85)
+                initial_state = {
+                    "workspace_path": workspace_path,
+                    "target_vulnerabilities": exploitable_findings,
+                    "current_vuln": None,
+                    "verified_reports": [],
+                    "retries": 0
+                }
 
-        # =====================================================
-        # STEP 4: Final Enrichment & Consolidation
-        # =====================================================
-        final_findings = []
-        for f in all_findings:
-            if f['id'] in verified_data:
-                f.update(verified_data[f['id']])
+                final_state = aurix_engine.invoke(initial_state)
+                verified_data = {r['id']: r for r in final_state.get('verified_reports', []) if 'id' in r}
             else:
-                f['verified'] = False
-            final_findings.append(f)
+                print(f"[PHASE 3] Skipped — no exploitable findings to analyze.")
 
-        elapsed = round(time.time() - start_time, 1)
-        
-        final_report = {
-            "scan_id": scan_id, "url": repo_url, "timestamp": datetime.now().isoformat(),
-            "summary": {
-                "total_findings": len(final_findings),
-                "exploitable_count": len(exploitable_findings),
-                "neutralized_count": sum(1 for f in final_findings if f.get('wargame_status') == "Neutralized"),
-                "scan_engine": "Project AURIX LangGraph v2 (Hyper-Batch)",
-                "elapsed_seconds": elapsed
-            },
-            "findings": final_findings
-        }
-        
-        output_path = os.path.join(self.results_dir, f"verified_report_{scan_id}.json")
-        with open(output_path, "w") as f:
-            json.dump(final_report, f, indent=2)
+            _post_progress(scan_id, "ANALYZING", "Consolidating report...", 85)
 
-        # =====================================================
-        # STEP 5: Webhook Handoff (Send to Bhavya's Backend)
-        # =====================================================
-        print(f"\n[STEP 5] Sending completed JSON Payload to Backend API -> {WEBHOOK_COMPLETE_URL}")
-        _post_progress(scan_id, "COMPLETED", f"Scan finished in {elapsed}s. Sending results...", 95)
-        
-        try:
-            headers = {
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {WEBHOOK_TOKEN}"
+            # ─────────────────────────────────────────
+            # PHASE 4: Report Generation & Webhook
+            # ─────────────────────────────────────────
+            # Merge verified data back into all_findings
+            final_findings = []
+            for f in all_findings:
+                if f.get('id') in verified_data:
+                    f.update(verified_data[f['id']])
+                else:
+                    f['verified'] = False
+                final_findings.append(f)
+
+            elapsed = round(time.time() - start_time, 1)
+
+            final_report = {
+                "scan_id": scan_id,
+                "url": repo_url,
+                "timestamp": datetime.now().isoformat(),
+                "summary": {
+                    "total_findings": len(final_findings),
+                    "exploitable_count": len(exploitable_findings),
+                    "neutralized_count": sum(1 for f in final_findings if f.get('wargame_status') == 'Neutralized'),
+                    "scan_engine": "Project AURIX LangGraph v3 (Adaptive Batch)",
+                    "elapsed_seconds": elapsed
+                },
+                "findings": final_findings
             }
-            response = requests.post(WEBHOOK_COMPLETE_URL, json=final_report, headers=headers, timeout=90)
-            if response.status_code == 200:
-                print("   [+] Webhook POST successful!")
-                _post_progress(scan_id, "COMPLETED", "Results delivered to backend.", 100)
-            else:
-                print(f"   [-] Webhook POST failed with status: {response.status_code} - {response.text}")
-                self._save_dead_letter(final_report, scan_id)
+
+            # Save locally
+            output_path = os.path.join(RESULTS_DIR, f"verified_report_{scan_id}.json")
+            with open(output_path, "w") as f:
+                json.dump(final_report, f, indent=2)
+            print(f"[PHASE 4] Report saved: {output_path}")
+
+            # Webhook delivery
+            if WEBHOOK_COMPLETE_URL:
+                try:
+                    res = requests.post(WEBHOOK_COMPLETE_URL, json=final_report, headers={
+                        "Content-Type": "application/json",
+                        "Authorization": f"Bearer {WEBHOOK_TOKEN}"
+                    }, timeout=90)
+                    if res.status_code == 200:
+                        print(f"[PHASE 4] Webhook delivered successfully.")
+                    else:
+                        print(f"[PHASE 4] Webhook failed: {res.status_code}")
+                        _save_dead_letter(final_report, scan_id)
+                except Exception as e:
+                    print(f"[PHASE 4] Webhook exception: {e}")
+                    _save_dead_letter(final_report, scan_id)
+
+            _post_progress(scan_id, "COMPLETED", f"Scan complete in {elapsed}s.", 100)
+
+            # ─────────────────────────────────────────
+            # PHASE 5: Cleanup
+            # ─────────────────────────────────────────
+            if workspace_path and os.path.exists(workspace_path):
+                try:
+                    shutil.rmtree(workspace_path, onerror=_remove_readonly)
+                    print(f"[PHASE 5] Workspace cleaned up.")
+                except Exception as e:
+                    print(f"[PHASE 5] Cleanup failed (non-fatal): {e}")
+
+            print(f"\n{'='*50}")
+            print(f"SCAN COMPLETE — {elapsed}s")
+            print(f"Total: {len(final_findings)} | Exploitable: {len(exploitable_findings)} | Neutralized: {final_report['summary']['neutralized_count']}")
+            print(f"{'='*50}")
+
+            return final_report
+
         except Exception as e:
-            print(f"   [-] Webhook Exception: {e}")
-            self._save_dead_letter(final_report, scan_id)
+            print(f"\n[FATAL] Unhandled exception in audit pipeline:")
+            traceback.print_exc()
+            _post_progress(scan_id, "FAILED", f"Engine crashed: {str(e)[:200]}", 0)
+            return {"error": str(e)}
 
-        print(f"\n[DONE] LangGraph Audit Complete in {elapsed}s.")
-        print(f"Total Findings: {len(final_findings)}")
-        print(f"Exploitable: {len(exploitable_findings)}")
-        print(f"Neutralized: {final_report['summary']['neutralized_count']}")
-        print(f"Report saved locally: {output_path}")
-
-        # =====================================================
-        # STEP 6: Final Cleanup
-        # =====================================================
-        print(f"[INFO] Purging temporary workspace to save storage...")
-        try:
-            import shutil
-            def _remove_readonly(func, path, excinfo):
-                import stat
-                os.chmod(path, stat.S_IWRITE)
-                func(path)
-            shutil.rmtree(workspace_path, onerror=_remove_readonly)
-        except Exception as e:
-            print(f"[WARN] Failed to purge workspace: {e}")
-
-        return final_report
-
-    def _save_dead_letter(self, report, scan_id):
-        """Saves reports that failed to sync to the webhook so they can be retried later."""
-        dlq_dir = "pending-sync"
-        os.makedirs(dlq_dir, exist_ok=True)
-        dlq_path = os.path.join(dlq_dir, f"failed_sync_{scan_id}.json")
-        with open(dlq_path, "w") as f:
-            json.dump(report, f, indent=2)
-        print(f"   [!] Saved to Dead Letter Queue: {dlq_path}")
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("Usage: python aurix_worker.py <repo_url> [scan_id]")
-    else:
-        worker = AurixWorker()
-        scan_id = sys.argv[2] if len(sys.argv) > 2 else None
-        worker.run_full_audit(sys.argv[1], scan_id=scan_id)
+        print("Usage: python aurix_worker.py <repo_url_or_zip_path> [scan_id]")
+        sys.exit(1)
+
+    target = sys.argv[1]
+    sid = sys.argv[2] if len(sys.argv) > 2 else None
+
+    worker = AurixWorker()
+    worker.run_full_audit(target, scan_id=sid)

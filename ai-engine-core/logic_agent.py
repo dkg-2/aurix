@@ -1,44 +1,51 @@
-# Aurix Logic Agent: Hyper-Batch Triage (Quota Optimized)
+import json
+from typing import List, Tuple, Dict, Any
 
-SYSTEM_PROMPT_LOGIC_HYPER_BATCH = """
-You are an expert Security Researcher. You will be provided with a LIST of potential vulnerabilities found by a static scanner across an entire project.
+SYSTEM_PROMPT_TRIAGE = """You are a vulnerability triage AI. Analyze findings and source code context.
+Return JSON: {"results": [{"finding_id": "<id>", "is_exploitable": <bool>, "confidence": <float>, "reasoning": "<1 sentence max>"}]}
+Mark False Positive if: input is hardcoded, in test/tutorial file, cast to safe type, or behind auth.
+Mark True Positive if: unsanitized user input reaches a dangerous sink.
+Respond ONLY with the JSON object."""
 
-YOUR TASK:
-Analyze every finding in the context of its source code. 
-Determine which are 'True Positives' (actually exploitable) and which are 'False Positives' (noisy/safe).
-
-OUTPUT FORMAT:
-You MUST return a JSON object with a 'results' key containing a list. 
-Each item MUST include the 'finding_id'.
-
-Example:
-{
-    "results": [
-        {
-            "finding_id": "javascript.lang.security.eval-detected",
-            "is_exploitable": true,
-            "confidence": 0.95,
-            "reasoning": "User input from req.body flows directly into eval() without sanitization."
-        }
-    ]
-}
-
-CRITERIA:
-- Mark as False Positive if: Input is hardcoded, logic is in a tutorial/test file, or input is cast to a safe type.
-- Mark as True Positive if: Unsanitized user input reaches a dangerous sink (eval, sql, subprocess).
-"""
-
-def format_hyper_batch_prompt(findings_with_context):
-    """
-    findings_with_context: List of tuples (finding_json, context_dict)
-    """
-    prompt = "Below are ALL potential vulnerabilities found in this project. Triage them all in one go.\n"
-    for i, (f, ctx) in enumerate(findings_with_context):
-        prompt += f"\n--- FINDING #{i+1} ---\n"
-        prompt += f"ID: {f.get('id')}\n"
-        prompt += f"TITLE: {f.get('title')}\n"
-        prompt += f"FILE: {f.get('file')}\n"
-        prompt += f"CODE:\n{ctx.get('context_snippet')}\n"
-    
-    prompt += "\nReturn the JSON results for all findings above."
+def format_batch_prompt(findings_with_context: List[Tuple[Dict[str, Any], Dict[str, Any]]]) -> str:
+    prompt = ""
+    for i, (finding, context) in enumerate(findings_with_context):
+        finding_id = finding.get("id", str(i))
+        title = finding.get("title", "Unknown")
+        file_path = finding.get("file", "unknown")
+        line = finding.get("line", "0")
+        
+        code = context.get("context_snippet", "")
+        if len(code) > 500:
+            code = code[:497] + "..."
+            
+        prompt += f"--- Finding {i+1} ---\n"
+        prompt += f"ID: {finding_id} | {title} | {file_path}:{line}\n"
+        prompt += f"Code:\n{code}\n\n"
+        
+    prompt += "Return JSON results for all findings."
     return prompt
+
+def estimate_batch_tokens(findings_with_context: List[Tuple[Dict[str, Any], Dict[str, Any]]]) -> int:
+    sys_chars = len(SYSTEM_PROMPT_TRIAGE)
+    prompt_chars = len(format_batch_prompt(findings_with_context))
+    total_chars = sys_chars + prompt_chars
+    return int(total_chars / 3.5)
+
+def create_adaptive_chunks(findings_with_context: List[Tuple[Dict[str, Any], Dict[str, Any]]], max_tokens: int = 4000) -> List[List[Tuple[Dict[str, Any], Dict[str, Any]]]]:
+    chunks = []
+    current_chunk = []
+    
+    for item in findings_with_context:
+        current_chunk.append(item)
+        
+        if estimate_batch_tokens(current_chunk) > max_tokens:
+            current_chunk.pop()
+            if current_chunk:
+                chunks.append(current_chunk)
+            current_chunk = [item]
+            
+    if current_chunk:
+        chunks.append(current_chunk)
+        
+    return chunks

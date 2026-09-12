@@ -1,12 +1,17 @@
 import docker
-import tempfile
 import os
+import uuid
 import shutil
 
 class SandboxExecutor:
     """
     Safely executes AI-generated Validation scripts.
     Supports 'Stateful Wargaming' by allowing Read-Write access during verification.
+    
+    Docker-out-of-Docker Fix:
+    When running inside a container, tempfile creates paths on the CONTAINER filesystem,
+    but Docker daemon mounts from the HOST filesystem. So we write exploit scripts to the
+    shared workspace volume (mounted as ./workspace on the host) which is accessible to both.
     """
 
     def __init__(self, image="aurix-sandbox:latest"):
@@ -25,23 +30,40 @@ class SandboxExecutor:
         if not self.client:
             return {"error": "Docker client not initialized."}
 
-        temp_dir = tempfile.mkdtemp(prefix="aurix_sandbox_")
-        script_path = os.path.join(temp_dir, "exploit.py")
-        
+        # Create a sandbox subdirectory inside the workspace (which is a shared Docker volume)
+        # This ensures the Docker daemon can access it from the host
+        sandbox_id = str(uuid.uuid4())[:8]
+        sandbox_dir = os.path.join(workspace_path, f".sandbox_{sandbox_id}")
+        script_path = os.path.join(sandbox_dir, "exploit.py")
+
         try:
+            os.makedirs(sandbox_dir, exist_ok=True)
             with open(script_path, "w", encoding="utf-8") as f:
                 f.write(script_content)
+
+            # Resolve host paths for Docker-out-of-Docker
+            host_workspace = os.getenv("HOST_WORKSPACE_DIR")
+            if host_workspace:
+                # Running inside a container — map to host paths
+                folder_name = os.path.basename(workspace_path)
+                clean_host = host_workspace.rstrip('/\\')
+                host_src_path = f"{clean_host}/{folder_name}"
+                host_sandbox_path = f"{host_src_path}/.sandbox_{sandbox_id}"
+            else:
+                # Running directly on host
+                host_src_path = os.path.abspath(workspace_path)
+                host_sandbox_path = os.path.abspath(sandbox_dir)
 
             # Define volumes
             mode = 'ro' if read_only else 'rw'
             volumes = {
-                temp_dir: {'bind': '/app', 'mode': 'ro'},
-                os.path.abspath(workspace_path): {'bind': '/src', 'mode': mode}
+                host_sandbox_path: {'bind': '/sandbox', 'mode': 'ro'},
+                host_src_path: {'bind': '/src', 'mode': mode}
             }
 
             container = self.client.containers.run(
                 image=self.image,
-                command=["python", "/app/exploit.py"],
+                command=["python", "/sandbox/exploit.py"],
                 volumes=volumes,
                 working_dir="/src",
                 mem_limit="256m",
@@ -70,4 +92,6 @@ class SandboxExecutor:
         except Exception as e:
             return {"error": f"Sandbox failure: {str(e)}"}
         finally:
-            shutil.rmtree(temp_dir, ignore_errors=True)
+            # Clean up the sandbox directory
+            if os.path.exists(sandbox_dir):
+                shutil.rmtree(sandbox_dir, ignore_errors=True)

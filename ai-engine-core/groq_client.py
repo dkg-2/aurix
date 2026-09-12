@@ -1,133 +1,118 @@
-from groq import Groq
-import json
 import os
+import json
 import threading
+import time
+import random
+import re
+from groq import Groq
 from dotenv import load_dotenv
 
-# Load .env file from project root
-load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
+# Load dotenv from parent directory
+parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+load_dotenv(os.path.join(parent_dir, '.env'))
 
-# Global lock so parallel workers coordinate key rotation
+# Thread-safe key rotation setup
+_api_keys = [k.strip() for k in os.environ.get("GROQ_API_KEY", "").split(",") if k.strip()]
 _key_lock = threading.Lock()
+_key_index = 0
 
-class AurixGroqClient:
-    """
-    Enhanced Groq Client with Thread-Safe Key Rotation for parallel scans.
-    """
+def estimate_tokens(text: str) -> int:
+    """Estimate tokens using ~3.5 chars per token heuristic."""
+    return max(1, int(len(text) / 3.5))
 
-    def __init__(self, api_key=None):
-        # Support multiple keys: GROQ_API_KEY="key1,key2,key3"
-        raw_keys = api_key or os.environ.get("GROQ_API_KEY", "")
-        self.api_keys = [k.strip() for k in raw_keys.split(",") if k.strip()]
-        self.current_key_index = 0
-        self._consecutive_429s = 0
+def _get_next_key() -> str:
+    """Thread-safe round-robin API key rotation."""
+    global _key_index
+    with _key_lock:
+        if not _api_keys:
+            raise ValueError("No GROQ API keys available. Please check your GROQ_API_KEY environment variable.")
+        key = _api_keys[_key_index]
+        _key_index = (_key_index + 1) % len(_api_keys)
+        return key
+
+def _reset_backoff():
+    """Hook to reset any global backoff state after a successful call."""
+    pass
+
+def _call_with_retries(model: str, prompt: str, max_tokens: int = None, require_json: bool = False) -> str:
+    """Internal method to handle API calls with exponential backoff, jitter, and key rotation."""
+    max_retries = 3
+    base_backoff = 1.0
+
+    for attempt in range(max_retries + 1):
+        api_key = _get_next_key()
+        # Create a new client instance with the rotated key and 30-second timeout
+        # max_retries=0 because we handle retries manually to rotate keys on failure
+        client = Groq(api_key=api_key, timeout=30.0, max_retries=0)
         
-        if not self.api_keys:
-            print("[WARN] No GROQ_API_KEY found.")
-            self.client = None
-        else:
-            self._init_client()
+        try:
+            messages = []
+            if require_json:
+                messages.append({"role": "system", "content": "You are an expert security analyst. You MUST respond with valid JSON only. No markdown, no explanation, just the JSON object."})
+            messages.append({"role": "user", "content": prompt})
+            
+            kwargs = {
+                "model": model,
+                "messages": messages,
+            }
+            if max_tokens is not None:
+                kwargs["max_tokens"] = max_tokens
+            if require_json:
+                kwargs["response_format"] = {"type": "json_object"}
+                
+            response = client.chat.completions.create(**kwargs)
+            _reset_backoff()
+            return response.choices[0].message.content
+            
+        except Exception as e:
+            # Handles Groq API errors: RateLimitError (429), APIStatusError (413), APITimeoutError
+            is_final_attempt = (attempt == max_retries)
+            if is_final_attempt:
+                print(f"API call failed after {max_retries} retries. Final error: {e}")
+                raise e
+            
+            # Exponential backoff with random 0-2s jitter
+            sleep_time = (base_backoff * (2 ** attempt)) + random.uniform(0, 2)
+            time.sleep(sleep_time)
+
+def call_triage(prompt: str, max_output_tokens: int = 1500) -> dict:
+    """
+    Uses triage model to return parsed JSON.
+    If response is not valid JSON, retries once with explicit JSON instruction.
+    """
+    model = 'openai/gpt-oss-20b'
+    try:
+        response_text = _call_with_retries(model, prompt, max_tokens=max_output_tokens, require_json=True)
+        return json.loads(response_text)
+    except (json.JSONDecodeError, TypeError):
+        # Retry once with explicit instruction if JSON parsing fails
+        retry_prompt = prompt + "\n\nYou must respond ONLY with valid JSON."
+        try:
+            response_text = _call_with_retries(model, retry_prompt, max_tokens=max_output_tokens, require_json=True)
+            return json.loads(response_text)
+        except Exception as e:
+            print(f"Failed to parse JSON after retry: {e}")
+            return {}
+    except Exception as e:
+        print(f"call_triage failed: {e}")
+        return {}
+
+def call_reasoning(prompt: str) -> str:
+    """
+    Uses reasoning model to return raw text.
+    Extracts code from ```python blocks if present.
+    """
+    model = 'openai/gpt-oss-120b'
+    try:
+        response_text = _call_with_retries(model, prompt)
         
-        self.triage_model = "openai/gpt-oss-20b"
-        self.reasoning_model = "openai/gpt-oss-120b"
-
-    def _init_client(self):
-        key = self.api_keys[self.current_key_index]
-        self.client = Groq(api_key=key)
-
-    def rotate_key(self):
-        """Thread-safe key rotation with exponential backoff."""
-        with _key_lock:
-            if len(self.api_keys) > 1:
-                self.current_key_index = (self.current_key_index + 1) % len(self.api_keys)
-                self._consecutive_429s += 1
-                # Exponential backoff: 5s, 10s, 20s, max 60s
-                wait = min(5 * (2 ** (self._consecutive_429s - 1)), 60)
-                print(f"[RATE LIMIT] Rotating to Key #{self.current_key_index + 1}. Backoff: {wait}s...")
-                import time
-                time.sleep(wait)
-                self._init_client()
-                return True
-            else:
-                # Single key — just wait with backoff
-                self._consecutive_429s += 1
-                wait = min(10 * self._consecutive_429s, 60)
-                print(f"[RATE LIMIT] Single key. Backoff: {wait}s...")
-                import time
-                time.sleep(wait)
-                return True
-
-    def _reset_backoff(self):
-        """Reset backoff counter after a successful call."""
-        self._consecutive_429s = 0
-
-    def call_logic_agent(self, prompt, retry=True):
-        try:
-            chat_completion = self.client.chat.completions.create(
-                messages=[
-                    {"role": "system", "content": "You are a helpful assistant that outputs only valid JSON. Ensure you return a complete object."},
-                    {"role": "user", "content": prompt}
-                ],
-                model=self.triage_model,
-                response_format={"type": "json_object"},
-                max_completion_tokens=2048 # Increase to avoid truncation
-            )
-            return json.loads(chat_completion.choices[0].message.content)
-        except Exception as e:
-            if "429" in str(e) and self.rotate_key():
-                return self.call_logic_agent(prompt, retry)
-            if "validation" in str(e).lower() and retry:
-                print("    [RETRY] JSON failed. Attempting with explicit JSON instruction...")
-                return self.call_logic_agent(prompt + "\nIMPORTANT: Return ONLY a valid JSON object.", retry=False)
-            print(f"    [DEBUG] Groq Triage Error: {e}")
-            return {"error": str(e), "results": []}
-
-    def call_red_agent(self, prompt):
-        # ... (existing red agent code) ...
-        try:
-            chat_completion = self.client.chat.completions.create(
-                messages=[
-                    {"role": "system", "content": "You are a professional security auditor. Output ONLY code within triple backticks. No conversational filler."},
-                    {"role": "user", "content": prompt}
-                ],
-                model=self.reasoning_model,
-            )
-            text = chat_completion.choices[0].message.content
-            # Normalize smart quotes and other common malformations
-            text = text.replace("’", "'").replace("“", '"').replace("”", '"')
-            
-            # Extract code between backticks - discard everything else
-            if "```python" in text:
-                return text.split("```python")[1].split("```")[0].strip()
-            elif "```" in text:
-                return text.split("```")[1].split("```")[0].strip()
-            
-            # If no backticks, it might be a refusal or a malformed response
-            return f"# Error: AI did not provide code block. Response was: {text[:50]}..."
-        except Exception as e:
-            if "429" in str(e) and self.rotate_key():
-                return self.call_red_agent(prompt)
-            return f"# Error: {str(e)}"
-
-    def call_blue_agent(self, prompt):
-        """Uses high-reasoning Groq model for Patch generation."""
-        try:
-            chat_completion = self.client.chat.completions.create(
-                messages=[
-                    {"role": "system", "content": "You are 'Aurix Blue', a professional security engineer. Output ONLY a Python patch script within triple backticks."},
-                    {"role": "user", "content": prompt}
-                ],
-                model=self.reasoning_model,
-            )
-            text = chat_completion.choices[0].message.content
-            text = text.replace("’", "'").replace("“", '"').replace("”", '"')
-            
-            if "```python" in text:
-                return text.split("```python")[1].split("```")[0].strip()
-            elif "```" in text:
-                return text.split("```")[1].split("```")[0].strip()
-            return f"# Error: No code block. Response: {text[:50]}..."
-        except Exception as e:
-            if "429" in str(e) and self.rotate_key():
-                return self.call_blue_agent(prompt)
-            return f"# Error: {str(e)}"
+        # Extract Python code blocks if present
+        pattern = r"```python\s*(.*?)\s*```"
+        matches = re.findall(pattern, response_text, re.DOTALL)
+        
+        if matches:
+            return "\n\n".join(matches)
+        return response_text
+    except Exception as e:
+        print(f"call_reasoning failed: {e}")
+        return ""

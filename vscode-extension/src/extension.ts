@@ -36,30 +36,65 @@ export function activate(context: vscode.ExtensionContext) {
     // STATUS BAR ITEM 🛡️
     // ---------------------------------------------------------
     const statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
-    statusBarItem.command = 'aurix.scanWorkspace'; // Clicking it triggers a scan!
+    statusBarItem.command = 'aurix.scanWorkspace';
     statusBarItem.text = '$(shield) AURIX: Ready';
     statusBarItem.tooltip = 'Click to run an AURIX Security Scan';
     statusBarItem.show();
     context.subscriptions.push(statusBarItem);
+
+    // Restore session silently on startup
+    authManager.restoreSession().then(async (restored) => {
+        if (restored) {
+            const user = await authManager.getCurrentUser();
+            if (user) {
+                statusBarItem.text = `$(shield) AURIX: ${user.email}`;
+                outputChannel.appendLine(`[AUTH] Session restored for ${user.email}`);
+            }
+        }
+    });
 
     // ---------------------------------------------------------
     // COMMAND 1: AURIX Login
     // ---------------------------------------------------------
     let loginDisposable = vscode.commands.registerCommand('aurix.login', async () => {
         outputChannel.appendLine('[INFO] User triggered aurix.login');
-        await authManager.login();
+        const success = await authManager.login();
+        if (success) {
+            const user = await authManager.getCurrentUser();
+            if (user) {
+                statusBarItem.text = `$(shield) AURIX: ${user.email}`;
+            }
+        }
+    });
+
+    // ---------------------------------------------------------
+    // COMMAND 1b: AURIX Logout
+    // ---------------------------------------------------------
+    let logoutDisposable = vscode.commands.registerCommand('aurix.logout', async () => {
+        await authManager.logout();
+        statusBarItem.text = '$(shield) AURIX: Ready';
     });
 
     // ---------------------------------------------------------
     // COMMAND 2: AURIX Scan Workspace
     // ---------------------------------------------------------
     let scanDisposable = vscode.commands.registerCommand('aurix.scanWorkspace', async () => {
-        
-        // 1. Verify User is Logged In
-        const token = await authManager.getToken();
+
+        // 1. Verify User is Logged In — auto-prompt if not
+        let token = await authManager.getToken();
         if (!token) {
-            vscode.window.showErrorMessage('AURIX: You must login first before scanning!');
-            return;
+            const action = await vscode.window.showWarningMessage(
+                'AURIX: You must be logged in to scan.',
+                'Login / Sign Up'
+            );
+            if (action === 'Login / Sign Up') {
+                const success = await authManager.login();
+                if (!success) { return; }
+                const user = await authManager.getCurrentUser();
+                if (user) { statusBarItem.text = `$(shield) AURIX: ${user.email}`; }
+                token = await authManager.getToken();
+            }
+            if (!token) { return; }
         }
 
         // Pop open the glorious new Dashboard UI!
@@ -225,7 +260,7 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.window.showWarningMessage('AURIX: Mock scan finished! Check the Mission Control UI.');
     });
 
-    context.subscriptions.push(loginDisposable, scanDisposable, mockScanDisposable);
+    context.subscriptions.push(loginDisposable, logoutDisposable, scanDisposable, mockScanDisposable);
 }
 
 export function deactivate() {

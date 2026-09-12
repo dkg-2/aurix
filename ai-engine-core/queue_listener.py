@@ -184,12 +184,17 @@ def main():
             print(f"{'='*60}")
             
             # 6. Spawn worker as a NON-BLOCKING subprocess
+            # Output goes to a per-scan log file (NOT subprocess.PIPE which can block!)
+            log_dir = os.path.join(os.path.dirname(__file__), "worker-logs")
+            os.makedirs(log_dir, exist_ok=True)
+            log_file = open(os.path.join(log_dir, f"worker_{scan_id}.log"), "w")
+
             cmd = ["docker", "exec", "aurix_ai_worker", "python", "aurix_worker.py", target, scan_id]
             
             process = subprocess.Popen(
                 cmd,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE
+                stdout=log_file,
+                stderr=log_file
             )
             
             with workers_lock:

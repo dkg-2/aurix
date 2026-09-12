@@ -95,8 +95,8 @@ class AurixWorker:
             ctx = fetcher.get_finding_context(f['file'], f['line'])
             findings_with_context.append((f, ctx))
 
-        # --- CHUNKED HYPER-BATCH: Process in groups of 15 to avoid token overflow ---
-        CHUNK_SIZE = 15
+        # --- CHUNKED HYPER-BATCH: Process in groups of 5 to stay under Groq's 8K TPM limit ---
+        CHUNK_SIZE = 5
         exploitable_findings = []
         if findings_with_context:
             client = AurixGroqClient()

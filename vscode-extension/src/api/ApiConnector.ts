@@ -19,7 +19,7 @@ export class ApiConnector {
             filename: 'workspace.zip',
             contentType: 'application/zip'
         });
-        form.append('project_id', '123e4567-e89b-12d3-a456-426614174000'); // Mock UUID for testing
+        form.append('project_id', '119574a9-8813-4768-92ae-e9abdfe7a0db'); // Real project_id from Supabase (QueueCTL)
 
         return await vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,

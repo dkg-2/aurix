@@ -197,22 +197,30 @@ def orchestrate_scan(repo_url, cleanup=True, scan_id=None):
     try:
         # Check if the target is a Zip file from Bhavya's Cloud Storage / IDE Upload
         if repo_url.endswith('.zip') or 'storage' in repo_url.lower():
-            print(f"[INFO] Detected storage URL. Fetching and extracting zip workspace...")
+            print(f"[INFO] Detected zip workspace. Extracting...")
             os.makedirs(scan_workspace, exist_ok=True)
-            import urllib.request
             import zipfile
-            
+
             zip_path = os.path.join(scan_workspace, "upload.zip")
-            req = urllib.request.Request(repo_url, headers={'User-Agent': 'Aurix-Worker/1.0'})
-            
-            with urllib.request.urlopen(req) as response, open(zip_path, 'wb') as out_file:
-                shutil.copyfileobj(response, out_file)
-            
+
+            # Handle both local file paths AND remote http/https URLs
+            if os.path.isfile(repo_url):
+                # Local file — copy it directly
+                print(f"[INFO] Local zip file detected. Copying to workspace...")
+                shutil.copy2(repo_url, zip_path)
+            else:
+                # Remote URL — download it
+                import urllib.request
+                print(f"[INFO] Remote zip URL detected. Downloading...")
+                req = urllib.request.Request(repo_url, headers={'User-Agent': 'Aurix-Worker/1.0'})
+                with urllib.request.urlopen(req) as response, open(zip_path, 'wb') as out_file:
+                    shutil.copyfileobj(response, out_file)
+
             with zipfile.ZipFile(zip_path, 'r') as zip_ref:
                 zip_ref.extractall(scan_workspace)
-                
+
             os.remove(zip_path) # Clean up to save space
-            print(f"[SUCCESS] Zip workspace extracted.")
+            print(f"[SUCCESS] Zip workspace extracted to {scan_workspace}")
             
         else:
             # Fallback to standard GitHub processing
